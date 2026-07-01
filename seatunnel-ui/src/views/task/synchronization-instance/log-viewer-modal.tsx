@@ -41,6 +41,10 @@ const LogViewerModal = defineComponent({
       type: [String, Number] as PropType<string | number>,
       default: ''
     },
+    jobInstanceId: {
+      type: [String, Number] as PropType<string | number>,
+      default: ''
+    },
     jobName: {
       type: String as PropType<string>,
       default: ''
@@ -75,28 +79,17 @@ const LogViewerModal = defineComponent({
     
     // Fetch log node list
     const fetchLogNodes = async () => {
-      if (!props.jobId) return
+      if (!props.jobId && !props.jobInstanceId) return
       
       loading.value = true
       error.value = ''
       
       try {
-        const response = await getLogNodes(props.jobId)
-        console.log('Log nodes response:', response)
-        
-        // Ensure response.data is an array
-        if (Array.isArray(response.data)) {
-          logNodes.value = response.data
-        } else {
-          console.error('Log nodes response is not an array:', response.data)
-          logNodes.value = []
-        }
-        
-        console.log('Log nodes:', logNodes.value)
+        const nodes = await getLogNodes(props.jobId, props.jobInstanceId)
+        logNodes.value = Array.isArray(nodes) ? nodes : []
         
         if (logNodes.value.length > 0) {
           selectedLogNode.value = logNodes.value[0].logLink
-          console.log('Selected log node:', selectedLogNode.value)
           fetchLogContent()
         } else {
           loading.value = false
@@ -120,39 +113,32 @@ const LogViewerModal = defineComponent({
       error.value = ''
       
       try {
-        console.log('Fetching log content for:', selectedLogNode.value)
-        const response = await getLogContent(selectedLogNode.value)
-        console.log('Log content response:', response)
+        const content = await getLogContent(
+          selectedLogNode.value,
+          props.jobId,
+          props.jobInstanceId
+        )
         
-        // Check if response.data exists
-        if (response && response.data !== undefined) {
-          // Ensure log content is a string
+        if (content !== undefined && content !== null) {
           let newContent = '';
-          if (typeof response.data === 'string') {
-            newContent = response.data
-          } else if (typeof response.data === 'object') {
-            // If it's an object, convert it to string
-            newContent = JSON.stringify(response.data, null, 2)
+          if (typeof content === 'string') {
+            newContent = content
+          } else if (typeof content === 'object') {
+            newContent = JSON.stringify(content, null, 2)
           } else {
-            // For other cases, force convert to string
-            newContent = String(response.data)
+            newContent = String(content)
           }
           
           // Only update content, not replace entire content, to avoid flicker
           if (newContent !== logContent.value) {
             logContent.value = newContent
-            console.log('Log content updated:', newContent.substring(0, 100) + '...')
             
-            // Only scroll to bottom when auto-scroll is enabled and user hasn't manually scrolled
             if (autoScroll.value && !userScrolled.value) {
               scrollToBottom()
             }
           }
-        } else {
-          console.error('Log content response is empty or invalid')
-          if (logContent.value === '') {
-            logContent.value = ''
-          }
+        } else if (logContent.value === '') {
+          logContent.value = ''
         }
         
         loading.value = false

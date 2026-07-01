@@ -30,6 +30,7 @@ import hook from '@/locales/en_US/hook'
 import common from '@/locales/en_US/common'
 import security from '@/locales/en_US/security'
 import transforms from '@/locales/en_US/transforms'
+import scheduler from '@/locales/en_US/scheduler'
 
 export default {
   security,
@@ -47,6 +48,7 @@ export default {
   project,
   hook,
   transforms,
+  scheduler,
   dag: {
     nodeConfigHint: 'Double click to configure. After configure, Connect each node ends to another.'
   }

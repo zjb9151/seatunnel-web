@@ -16,7 +16,6 @@
  */
 
 import { axios } from '@/service/service'
-import rawAxios from 'axios'
 import type { LogParams, LogRes, LogNode } from './types'
 
 // Query task logs
@@ -29,36 +28,37 @@ export function queryLog(params: LogParams): Promise<LogRes> {
 }
 
 // Get log node list
-export function getLogNodes(jobId: string | number): Promise<any> {
-  // Here we use raw axios to make direct requests, avoiding the addition of /seatunnel/api/v1 prefix
-  return rawAxios.get(`/api/logs/${jobId}`, {
-    params: { format: 'json' }
+export function getLogNodes(
+  jobEngineId?: string | number,
+  jobInstanceId?: string | number
+): Promise<LogNode[]> {
+  return axios({
+    url: '/job/log/nodes',
+    method: 'get',
+    params: {
+      jobEngineId: jobEngineId || undefined,
+      jobInstanceId: jobInstanceId || undefined
+    }
   })
 }
 
 // Get log content
-export function getLogContent(logUrl: string): Promise<{ data: string }> {
-  console.log('Getting log content for URL:', logUrl);
-  
-  // Handle external URLs
-  if (logUrl.startsWith('http')) {
-    try {
-      // Extract path part from URL
-      const url = new URL(logUrl);
-      const pathName = url.pathname;
-      const search = url.search;
-      
-      // Request through proxy
-      return rawAxios.get(`/api${pathName}${search}`);
-    } catch (e) {
-      console.error('Error fetching log content:', e);
-      return Promise.reject(new Error('Failed to fetch log content'));
+export function getLogContent(
+  logFileName: string,
+  jobEngineId?: string | number,
+  jobInstanceId?: string | number
+): Promise<string> {
+  const file = logFileName.includes('/')
+    ? logFileName.substring(logFileName.lastIndexOf('/') + 1)
+    : logFileName
+
+  return axios({
+    url: '/job/log/content',
+    method: 'get',
+    params: {
+      file,
+      jobEngineId: jobEngineId || undefined,
+      jobInstanceId: jobInstanceId || undefined
     }
-  } else {
-    // If not a complete URL, use the file name directly
-    const logFileName = logUrl.split('/').pop() || '';
-    
-    // Directly request through raw axios, avoiding the addition of /seatunnel/api/v1 prefix
-    return rawAxios.get(`/api/logs/content/${logFileName}`);
-  }
+  })
 }

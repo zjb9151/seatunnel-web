@@ -53,6 +53,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @Service
@@ -140,6 +141,7 @@ public class TaskInstanceServiceImpl extends SeatunnelBaseServiceImpl
             return null;
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
 
         try {
             return dateFormat.parse(time);

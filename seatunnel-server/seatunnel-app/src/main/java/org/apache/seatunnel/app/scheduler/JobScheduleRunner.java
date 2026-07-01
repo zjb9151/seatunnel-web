@@ -48,16 +48,18 @@ public class JobScheduleRunner {
     @Resource private IJobScheduleDao jobScheduleDao;
     @Resource private IJobExecutorService jobExecutorService;
 
-    private final ConcurrentHashMap<Long, Long> lastTriggeredMinute = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, Long> lastTriggeredSecond = new ConcurrentHashMap<>();
 
-    @Scheduled(cron = "0 * * * * *")
+    /** Poll every second so second-level cron expressions (e.g. every 5s) can fire. */
+    @Scheduled(cron = "* * * * * *")
     public void triggerInternalSchedules() {
         List<JobSchedule> schedules = jobScheduleDao.listAllEnabledInternalSchedules();
         if (schedules.isEmpty()) {
             return;
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now().withNano(0);
+        long currentEpochSecond = now.atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
         for (JobSchedule schedule : schedules) {
             try {
                 if (!JobScheduleServiceImpl.SCHEDULE_TYPE_INTERNAL.equals(
@@ -73,32 +75,19 @@ public class JobScheduleRunner {
                 }
 
                 CronExpression cron = CronExpression.parse(schedule.getCrontab());
-                LocalDateTime previousMinute = now.minusMinutes(1).withSecond(0).withNano(0);
-                LocalDateTime next = cron.next(previousMinute);
-                if (next == null) {
+                // next() returns the first match strictly after the given time
+                LocalDateTime next = cron.next(now.minusSeconds(1));
+                if (next == null || !next.equals(now)) {
                     continue;
                 }
 
-                long scheduledEpochMinute =
-                        next.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 60_000;
-                long currentEpochMinute =
-                        now.withSecond(0)
-                                        .withNano(0)
-                                        .atZone(ZoneId.systemDefault())
-                                        .toInstant()
-                                        .toEpochMilli()
-                                / 60_000;
-                if (scheduledEpochMinute != currentEpochMinute) {
-                    continue;
-                }
-
-                Long lastMinute = lastTriggeredMinute.get(schedule.getId());
-                if (lastMinute != null && lastMinute == currentEpochMinute) {
+                Long lastSecond = lastTriggeredSecond.get(schedule.getId());
+                if (lastSecond != null && lastSecond == currentEpochSecond) {
                     continue;
                 }
 
                 executeScheduledJob(schedule);
-                lastTriggeredMinute.put(schedule.getId(), currentEpochMinute);
+                lastTriggeredSecond.put(schedule.getId(), currentEpochSecond);
                 jobScheduleDao.updateLastTriggerTime(schedule.getId(), new Date());
             } catch (Exception e) {
                 log.error(

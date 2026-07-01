@@ -20,6 +20,7 @@ import tasks from '@/router/tasks'
 import userManage from '@/router/user-manage'
 import datasource from '@/router/datasource'
 import virtualTables from '@/router/virtual-tables'
+import scheduler from '@/router/scheduler'
 import type { RouteRecordRaw } from 'vue-router'
 import type { Component } from 'vue'
 
@@ -34,7 +35,8 @@ const basePage: RouteRecordRaw[] = [
   tasks,
   userManage,
   datasource,
-  virtualTables
+  virtualTables,
+  scheduler
 ]
 
 const loginPage: RouteRecordRaw[] = [

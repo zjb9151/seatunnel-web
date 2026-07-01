@@ -23,9 +23,10 @@ spring:
     name: seatunnel
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.50.216:3306/seatunnel?useSSL=false&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://192.168.50.216:3306/seatunnel?useSSL=false&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: seatunnel
     password: seatunnel
   mvc:
@@ -66,11 +67,22 @@ seatunnel-web:
         - password
         - auth
   access-controller-class: org.apache.seatunnel.app.permission.SeatunnelAccessControllerDefaultImpl
+  engine:
+    # SeaTunnel Engine REST API (see seatunnel.yaml engine.http.port)
+    http-url: http://127.0.0.1:8080
+    # Optional: override engine log directory (default: ${SEATUNNEL_HOME}/logs)
+    # log-path:
 
 dolphinscheduler:
-  enabled: false
+  enabled: true
   api-url: http://127.0.0.1:12345/dolphinscheduler
+  # API token for schedule sync; also used for embedded UI auth when set
   token: ""
+  # DS login credentials for embedded UI (used when token is empty)
+  username: admin
+  password: dolphinscheduler123
+  # Embedded UI path (proxied through SeaTunnel Web backend)
+  ui-url: /dolphinscheduler/ui/
   project-code: seatunnel
   seatunnel-web-url: http://127.0.0.1:8801
   service-token: ""

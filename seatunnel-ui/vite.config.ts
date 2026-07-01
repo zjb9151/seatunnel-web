@@ -42,6 +42,10 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_APP_DEV_WEB_URL || 'http://127.0.0.1:8801',
           changeOrigin: true
         },
+        '/dolphinscheduler': {
+          target: env.VITE_APP_DEV_WEB_URL || 'http://127.0.0.1:8801',
+          changeOrigin: true
+        },
         '/api': {
           target: 'http://localhost:8080',
           changeOrigin: true,

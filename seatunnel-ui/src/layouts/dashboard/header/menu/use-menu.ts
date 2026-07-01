@@ -36,6 +36,10 @@ export function useMenu() {
       key: 'virtual-tables'
     },
     {
+      label: () => h(NEllipsis, null, { default: () => t('menu.scheduler') }),
+      key: 'scheduler'
+    },
+    {
       label: () => h(NEllipsis, null, { default: () => t('menu.user_manage') }),
       key: 'user-manage'
     }

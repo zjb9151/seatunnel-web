@@ -47,4 +47,13 @@ public class DolphinSchedulerProperties {
 
     /** DS tenant code */
     private String tenantCode = "default";
+
+    /** DolphinScheduler UI entry URL (relative proxy path or absolute URL) */
+    private String uiUrl = "/dolphinscheduler/ui/";
+
+    /** DS login username for embedded UI (used when token is empty) */
+    private String username = "admin";
+
+    /** DS login password for embedded UI (used when token is empty) */
+    private String password = "dolphinscheduler123";
 }

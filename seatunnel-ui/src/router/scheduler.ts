@@ -15,16 +15,30 @@
  * limitations under the License.
  */
 
+import utils from '@/utils'
+import type { Component } from 'vue'
+
+const modules = import.meta.glob('/src/views/**/**.tsx')
+const components: { [key: string]: Component } = utils.mapping(modules)
+
 export default {
-  user_manage: 'User Manage',
-  help: 'Help',
-  setting: 'Setting',
-  logout: 'Logout',
-  tasks: 'Tasks',
-  datasource: 'Datasource',
-  virtual_tables: 'Virtual Tables',
-  sync_task_definition: 'Syncing Task Definition',
-  sync_task_instance: 'Syncing Task Instance',
-  synchronization_instance: 'Syncing Task Instance',
-  scheduler: 'Scheduler',
+  path: '/scheduler',
+  name: 'scheduler',
+  meta: {
+    title: 'scheduler'
+  },
+  redirect: { name: 'scheduler-index' },
+  component: () => import('@/layouts/dashboard'),
+  children: [
+    {
+      path: '/scheduler',
+      name: 'scheduler-index',
+      component: components['scheduler-index'],
+      meta: {
+        title: 'scheduler',
+        activeMenu: 'scheduler',
+        fullContent: true
+      }
+    }
+  ]
 }

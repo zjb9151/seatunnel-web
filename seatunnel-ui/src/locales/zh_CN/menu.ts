@@ -26,4 +26,5 @@ export default {
   sync_task_definition: '同步任务定义',
   sync_task_instance: '同步任务实例',
   synchronization_instance: '同步任务实例',
+  scheduler: '调度器',
 }

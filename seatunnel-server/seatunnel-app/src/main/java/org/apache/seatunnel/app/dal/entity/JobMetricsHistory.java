@@ -79,11 +79,11 @@ public class JobMetricsHistory {
     @TableField("update_user_id")
     private Integer updateUserId;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     @TableField("create_time")
     private LocalDateTime createTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     @TableField("update_time")
     private LocalDateTime updateTime;
 }

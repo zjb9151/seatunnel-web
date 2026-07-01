@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-export default {
-  user_manage: 'User Manage',
-  help: 'Help',
-  setting: 'Setting',
-  logout: 'Logout',
-  tasks: 'Tasks',
-  datasource: 'Datasource',
-  virtual_tables: 'Virtual Tables',
-  sync_task_definition: 'Syncing Task Definition',
-  sync_task_instance: 'Syncing Task Instance',
-  synchronization_instance: 'Syncing Task Instance',
-  scheduler: 'Scheduler',
+package org.apache.seatunnel.app.service;
+
+import org.apache.seatunnel.app.domain.response.job.JobLogNodeRes;
+
+import java.util.List;
+
+public interface IJobLogService {
+
+    List<JobLogNodeRes> listLogNodes(String jobEngineId, Long jobInstanceId);
+
+    String getLogContent(String logFileName, String jobEngineId, Long jobInstanceId);
 }

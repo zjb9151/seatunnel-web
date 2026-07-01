@@ -371,6 +371,7 @@ const SyncTask = defineComponent({
         <LogViewerModal
           show={this.showLogViewerModal}
           jobId={this.currentJobId}
+          jobInstanceId={this.currentJobInstanceId}
           jobName={this.currentJobName}
           onUpdateShow={(v: boolean) => this.showLogViewerModal = v}
         />

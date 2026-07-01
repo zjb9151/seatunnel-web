@@ -16,15 +16,9 @@
  */
 
 export default {
-  user_manage: 'User Manage',
-  help: 'Help',
-  setting: 'Setting',
-  logout: 'Logout',
-  tasks: 'Tasks',
-  datasource: 'Datasource',
-  virtual_tables: 'Virtual Tables',
-  sync_task_definition: 'Syncing Task Definition',
-  sync_task_instance: 'Syncing Task Instance',
-  synchronization_instance: 'Syncing Task Instance',
-  scheduler: 'Scheduler',
+  unavailable: 'DolphinScheduler 不可用',
+  not_configured: 'DolphinScheduler 未配置或未启用',
+  load_failed: '加载 DolphinScheduler 信息失败',
+  check_config:
+    '请检查 application.yml 中 dolphinscheduler 配置，并确保 DolphinScheduler 服务已启动。'
 }

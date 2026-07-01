@@ -25,6 +25,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.util.TimeZone;
+
 @SpringBootApplication(scanBasePackages = {"org.apache.seatunnel.app"})
 @EnableTransactionManagement
 @EnableConfigurationProperties
@@ -33,6 +35,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @MapperScan({"org.apache.seatunnel.app.dal.mapper"})
 public class SeatunnelApplication {
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         SpringApplication.run(SeatunnelApplication.class, args);
     }
 }

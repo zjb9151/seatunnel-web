@@ -15,16 +15,20 @@
  * limitations under the License.
  */
 
-export default {
-  user_manage: 'User Manage',
-  help: 'Help',
-  setting: 'Setting',
-  logout: 'Logout',
-  tasks: 'Tasks',
-  datasource: 'Datasource',
-  virtual_tables: 'Virtual Tables',
-  sync_task_definition: 'Syncing Task Definition',
-  sync_task_instance: 'Syncing Task Instance',
-  synchronization_instance: 'Syncing Task Instance',
-  scheduler: 'Scheduler',
+package org.apache.seatunnel.app.domain.response.job;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class JobLogNodeRes {
+
+    private String node;
+
+    private String logName;
+
+    private String logLink;
 }

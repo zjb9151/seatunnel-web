@@ -30,6 +30,7 @@ import hook from '@/locales/zh_CN/hook'
 import common from '@/locales/zh_CN/common'
 import security from '@/locales/zh_CN/security'
 import transforms from '@/locales/zh_CN/transforms'
+import scheduler from '@/locales/zh_CN/scheduler'
 
 export default {
   security,
@@ -47,6 +48,7 @@ export default {
   project,
   hook,
   transforms,
+  scheduler,
   dag: {
     nodeConfigHint: '双击节点进行配置。配置完成后，连接每个节点的端点到其他节点。'
   }
