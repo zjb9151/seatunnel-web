@@ -18,7 +18,7 @@
 import { useI18n } from 'vue-i18n'
 import { h, reactive, ref } from 'vue'
 import { useTableOperation } from '@/hooks'
-import { EditOutlined, PlayCircleOutlined } from '@vicons/antd'
+import { EditOutlined, PlayCircleOutlined, ClockCircleOutlined } from '@vicons/antd'
 import {
   querySyncTaskDefinitionPaging,
   deleteSyncTaskDefinition,
@@ -43,6 +43,7 @@ export function useTable() {
     searchName: ref(''),
     totalPage: ref(1),
     showModalRef: ref(false),
+    showScheduleModalRef: ref(false),
     statusRef: ref(0),
     row: {},
     loadingRef: ref(false),
@@ -112,6 +113,14 @@ export function useTable() {
                 handleRun(row)
               },
               icon: h(PlayCircleOutlined)
+            },
+            {
+              text: t('project.synchronization_definition.schedule'),
+              onClick: (row: any) => {
+                variables.row = row
+                variables.showScheduleModalRef = true
+              },
+              icon: h(ClockCircleOutlined)
             },
             {
               isDelete: true,

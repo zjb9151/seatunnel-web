@@ -25,9 +25,9 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/seatunnel?useSSL=false&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&allowPublicKeyRetrieval=true
-    username: root
-    password: 123456
+    url: jdbc:mysql://192.168.50.216:3306/seatunnel?useSSL=false&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&allowPublicKeyRetrieval=true
+    username: seatunnel
+    password: seatunnel
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -48,11 +48,17 @@ spring:
 
 jwt:
   expireTime: 86400
-  # please add key when deploy
-  secretKey:
+  # HS256 requires key length >= 32 bytes (256 bits)
+  secretKey: seatunnel-web-jwt-secret-key-2026
   algorithm: HS256
 
 seatunnel-web:
+  database:
+    # H2 file database directory (used when spring.profiles.active=h2)
+    data-dir: ./data
+    schema-location: classpath:script/seatunnel_server_h2.sql
+    # MySQL schema script (used when NOT using h2 profile)
+    mysql-schema-location: classpath:script/seatunnel_server_mysql.sql
   datasource:
     encryption:
       type: none
@@ -60,6 +66,15 @@ seatunnel-web:
         - password
         - auth
   access-controller-class: org.apache.seatunnel.app.permission.SeatunnelAccessControllerDefaultImpl
+
+dolphinscheduler:
+  enabled: false
+  api-url: http://127.0.0.1:12345/dolphinscheduler
+  token: ""
+  project-code: seatunnel
+  seatunnel-web-url: http://127.0.0.1:8801
+  service-token: ""
+  tenant-code: default
 ---
 spring:
   config:
@@ -67,10 +82,11 @@ spring:
       on-profile: h2
   sql:
     init:
-      schema-locations: classpath*:script/seatunnel_server_h2.sql
+      # Schema is initialized only on first startup by H2SchemaInitializer
+      mode: never
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:seatunnel;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
+    url: jdbc:h2:file:${seatunnel-web.database.data-dir}/seatunnel;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
     username: sa
     password: sa
   h2:
@@ -80,3 +96,17 @@ spring:
       settings:
         trace: false
         web-allow-others: false
+---
+spring:
+  config:
+    activate:
+      on-profile: h2-mem
+  sql:
+    init:
+      schema-locations: classpath*:script/seatunnel_server_h2.sql
+      mode: embedded
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:seatunnel;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
+    username: sa
+    password: sa

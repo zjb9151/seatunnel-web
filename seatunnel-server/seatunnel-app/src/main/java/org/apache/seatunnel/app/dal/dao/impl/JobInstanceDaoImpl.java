@@ -94,6 +94,9 @@ public class JobInstanceDaoImpl implements IJobInstanceDao {
 
     @Override
     public List<JobInstance> getAllJobInstance(@NonNull List<Long> jobInstanceIdList) {
+        if (jobInstanceIdList.isEmpty()) {
+            return List.of();
+        }
         return jobInstanceMapper.selectList(
                 new LambdaQueryWrapper<JobInstance>()
                         .in(JobInstance::getId, jobInstanceIdList)

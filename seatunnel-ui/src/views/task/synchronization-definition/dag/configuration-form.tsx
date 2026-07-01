@@ -202,6 +202,14 @@ const ConfigurationForm = defineComponent({
               <NSelect
                 filterable
                 loading={state.datasourceLoading}
+                disabled={
+                  props.nodeType === 'source' && !state.model.sceneMode
+                }
+                placeholder={
+                  props.nodeType === 'source' && !state.model.sceneMode
+                    ? t('project.synchronization_definition.scene_mode_first')
+                    : t('project.synchronization_definition.datasource_tips')
+                }
                 options={state.datasourceOptions}
                 v-model={[state.model.datasourceInstanceId, 'value']}
                 onUpdateValue={(v, option) => {

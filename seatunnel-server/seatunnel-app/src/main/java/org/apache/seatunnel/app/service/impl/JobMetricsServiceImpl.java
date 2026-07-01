@@ -60,6 +60,7 @@ import javax.annotation.Resource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -704,16 +705,31 @@ public class JobMetricsServiceImpl extends SeatunnelBaseServiceImpl implements I
 
     @Override
     @NonNull public List<JobMetricsHistory> getJobMetricsHistory(@NonNull Long jobInstanceId) {
-        return jobMetricsHistoryMapper.queryJobMetricsHistoryByInstanceId(jobInstanceId);
+        try {
+            return jobMetricsHistoryMapper.queryJobMetricsHistoryByInstanceId(jobInstanceId);
+        } catch (Exception e) {
+            log.warn("Failed to query job metrics history for instance {}", jobInstanceId, e);
+            return Collections.emptyList();
+        }
     }
 
     @Override
     public List<JobMetricsHistory> getJobMetricsHistory(
             Long jobInstanceId, String startTime, String endTime) {
-        if (StringUtils.isNotEmpty(startTime) && StringUtils.isNotEmpty(endTime)) {
-            return jobMetricsHistoryMapper.queryJobMetricsHistoryByInstanceIdAndTimeRange(
-                    jobInstanceId, startTime, endTime);
+        try {
+            if (StringUtils.isNotEmpty(startTime) && StringUtils.isNotEmpty(endTime)) {
+                return jobMetricsHistoryMapper.queryJobMetricsHistoryByInstanceIdAndTimeRange(
+                        jobInstanceId, startTime, endTime);
+            }
+            return getJobMetricsHistory(jobInstanceId);
+        } catch (Exception e) {
+            log.warn(
+                    "Failed to query job metrics history for instance {} between {} and {}",
+                    jobInstanceId,
+                    startTime,
+                    endTime,
+                    e);
+            return Collections.emptyList();
         }
-        return getJobMetricsHistory(jobInstanceId);
     }
 }

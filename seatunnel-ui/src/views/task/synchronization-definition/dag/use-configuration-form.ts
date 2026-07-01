@@ -177,10 +177,11 @@ export const useConfigurationForm = (
     if (state.datasourceLoading) return
     state.datasourceLoading = true
     try {
-      const result = await listSourceName(
-        route.params.jobDefinitionCode as string,
-        sceneMode
-      )
+      const jobId = route.params.jobDefinitionCode as string
+      let result = await listSourceName(jobId, sceneMode, 'DOWNLOADED')
+      if (!result?.length) {
+        result = await listSourceName(jobId, sceneMode, 'ALL')
+      }
       state.datasourceOptions = result.map((item: any) => ({
         label: item.dataSourceInstanceName,
         value: item.dataSourceInstanceId,
@@ -188,6 +189,11 @@ export const useConfigurationForm = (
           item.dataSourceInfo?.connectorInfo?.pluginIdentifier.pluginName,
         datasourceName: item.dataSourceInfo?.datasourceName
       }))
+      if (sceneMode && !result?.length) {
+        window.$message.warning(
+          t('project.synchronization_definition.datasource_empty_hint')
+        )
+      }
     } finally {
       state.datasourceLoading = false
     }
@@ -254,7 +260,11 @@ export const useConfigurationForm = (
     try {
       if (state.datasourceLoading) return
       state.datasourceLoading = true
-      const result = await findSink(route.params.jobDefinitionCode as string)
+      const jobId = route.params.jobDefinitionCode as string
+      let result = await findSink(jobId, 'DOWNLOADED')
+      if (!result?.length) {
+        result = await findSink(jobId, 'ALL')
+      }
       state.datasourceOptions = result.map((item: any) => ({
         label: item.dataSourceInstanceName,
         value: item.dataSourceInstanceId,

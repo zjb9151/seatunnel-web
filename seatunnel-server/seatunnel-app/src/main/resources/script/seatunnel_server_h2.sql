@@ -265,6 +265,54 @@ CREATE TABLE workspace (
 
 INSERT INTO workspace (workspace_name, description) VALUES ('default', 'default workspace');
 
+-- ----------------------------
+-- Table structure for t_st_job_metrics_history
+-- ----------------------------
+DROP TABLE IF EXISTS t_st_job_metrics_history;
+CREATE TABLE t_st_job_metrics_history (
+    id BIGINT NOT NULL PRIMARY KEY,
+    job_instance_id BIGINT NOT NULL,
+    pipeline_id INT NOT NULL,
+    read_row_count BIGINT NOT NULL,
+    write_row_count BIGINT NOT NULL,
+    source_table_names VARCHAR(200),
+    sink_table_names VARCHAR(200),
+    read_qps BIGINT,
+    write_qps BIGINT,
+    record_delay BIGINT,
+    status VARCHAR(20),
+    create_user_id INT NOT NULL,
+    update_user_id INT,
+    create_time TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    update_time TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP()
+);
+
+CREATE INDEX idx_job_instance_id_create_time ON t_st_job_metrics_history (job_instance_id, create_time);
+
+-- ----------------------------
+-- Table structure for t_st_job_schedule
+-- ----------------------------
+DROP TABLE IF EXISTS t_st_job_schedule;
+CREATE TABLE t_st_job_schedule (
+    id BIGINT NOT NULL PRIMARY KEY,
+    job_define_id BIGINT NOT NULL,
+    schedule_name VARCHAR(255) NOT NULL,
+    crontab VARCHAR(128) NOT NULL,
+    schedule_type VARCHAR(32) NOT NULL DEFAULT 'INTERNAL',
+    enabled TINYINT NOT NULL DEFAULT 1,
+    ds_project_code VARCHAR(128),
+    ds_process_definition_code BIGINT,
+    ds_schedule_id INT,
+    last_trigger_time TIMESTAMP(3),
+    create_user_id INT NOT NULL,
+    update_user_id INT,
+    create_time TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    update_time TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    workspace_id BIGINT NOT NULL
+);
+
+CREATE INDEX idx_job_schedule_job_define_id ON t_st_job_schedule (job_define_id);
+
 -- Records of user_login_log
 -- No equivalent records provided for the user_login_log table in the provided SQL script.
 -- You can insert records into this table using similar INSERT INTO statements.

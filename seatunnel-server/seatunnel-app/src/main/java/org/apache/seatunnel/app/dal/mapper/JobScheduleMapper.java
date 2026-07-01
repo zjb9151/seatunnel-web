@@ -15,18 +15,10 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
+package org.apache.seatunnel.app.dal.mapper;
 
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US
-  }
-})
+import org.apache.seatunnel.app.dal.entity.JobSchedule;
 
-export default i18n
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+public interface JobScheduleMapper extends BaseMapper<JobSchedule> {}

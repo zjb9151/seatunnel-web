@@ -15,18 +15,22 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
+package org.apache.seatunnel.app.domain.response.job;
 
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US
-  }
-})
+import lombok.Data;
 
-export default i18n
+import java.util.Date;
+
+@Data
+public class JobScheduleRes {
+    private Long id;
+    private Long jobDefineId;
+    private String scheduleName;
+    private String crontab;
+    private String scheduleType;
+    private Boolean enabled;
+    private String dsProjectCode;
+    private Long dsProcessDefinitionCode;
+    private Integer dsScheduleId;
+    private Date lastTriggerTime;
+}

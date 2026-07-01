@@ -15,18 +15,16 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
+package org.apache.seatunnel.app.domain.request.job;
 
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US
-  }
-})
+import lombok.Data;
 
-export default i18n
+@Data
+public class JobScheduleReq {
+    private String scheduleName;
+    private String crontab;
+    /** INTERNAL or DOLPHIN_SCHEDULER */
+    private String scheduleType;
+
+    private Boolean enabled;
+}

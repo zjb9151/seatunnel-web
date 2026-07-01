@@ -29,6 +29,7 @@ import { useI18n } from 'vue-i18n'
 import { SearchOutlined, ReloadOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { TaskModal } from './task-modal'
+import { ScheduleModal } from './schedule-modal'
 import { useRoute, useRouter } from 'vue-router'
 import _ from 'lodash'
 
@@ -55,6 +56,14 @@ const SynchronizationDefinition = defineComponent({
 
     const onCancelModal = () => {
       variables.showModalRef = false
+    }
+
+    const onCancelScheduleModal = () => {
+      variables.showScheduleModalRef = false
+    }
+
+    const onConfirmScheduleModal = () => {
+      variables.showScheduleModalRef = false
     }
 
     const onConfirmModal = () => {
@@ -117,6 +126,8 @@ const SynchronizationDefinition = defineComponent({
       requestData,
       onCancelModal,
       onConfirmModal,
+      onCancelScheduleModal,
+      onConfirmScheduleModal,
       handleModalChange,
       onSearch,
       handleKeyup,
@@ -178,6 +189,12 @@ const SynchronizationDefinition = defineComponent({
           showModalRef={this.showModalRef}
           onCancelModal={this.onCancelModal}
           onConfirmModal={this.onConfirmModal}
+        />
+        <ScheduleModal
+          showModalRef={this.showScheduleModalRef}
+          row={this.row}
+          onCancelModal={this.onCancelScheduleModal}
+          onConfirmModal={this.onConfirmScheduleModal}
         />
       </NSpace>
     )

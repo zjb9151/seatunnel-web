@@ -295,7 +295,7 @@ export function useTaskMetrics() {
       }
 
       const res = await queryJobMetricsHistory(params)
-      variables.metricsData = res
+      variables.metricsData = Array.isArray(res) ? res : []
 
       if (variables.readRowCountChart) {
         variables.readRowCountChart.setOption(

@@ -22,9 +22,7 @@ import {
   NDialogProvider,
   darkTheme,
   dateZhCN,
-  dateEnUS,
-  zhCN,
-  enUS
+  zhCN
 } from 'naive-ui'
 import { useThemeStore } from '@/store/theme'
 import { useSettingStore } from '@/store/setting'
@@ -49,10 +47,9 @@ const App = defineComponent({
 
     settingStore.getFilletValue && setBorderRadius(settingStore.getFilletValue)
 
-    if (settingStore.getLocales) {
-      const { locale } = useI18n()
-      locale.value = settingStore.getLocales
-    }
+    const { locale } = useI18n()
+    settingStore.setLocales('zh_CN')
+    locale.value = 'zh_CN'
 
     watch(
       () => settingStore.getFilletValue,
@@ -73,10 +70,8 @@ const App = defineComponent({
       <NConfigProvider
         theme={this.currentTheme}
         theme-overrides={this.themeOverrides}
-        date-locale={
-          this.settingStore.getLocales === 'zh_CN' ? dateZhCN : dateEnUS
-        }
-        locale={this.settingStore.getLocales === 'zh_CN' ? zhCN : enUS}
+        date-locale={dateZhCN}
+        locale={zhCN}
       >
         <NMessageProvider>
           <NDialogProvider>

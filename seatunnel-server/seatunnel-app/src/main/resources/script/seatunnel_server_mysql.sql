@@ -313,3 +313,24 @@ create table t_st_job_metrics_history
 create index idx_job_instance_id_create_time
     on t_st_job_metrics_history (job_instance_id, create_time);
 
+DROP TABLE IF EXISTS `t_st_job_schedule`;
+CREATE TABLE `t_st_job_schedule` (
+    `id`                         bigint       NOT NULL PRIMARY KEY,
+    `job_define_id`              bigint       NOT NULL,
+    `schedule_name`              varchar(255) NOT NULL,
+    `crontab`                    varchar(128) NOT NULL,
+    `schedule_type`              varchar(32)  NOT NULL DEFAULT 'INTERNAL',
+    `enabled`                    tinyint      NOT NULL DEFAULT 1,
+    `ds_project_code`            varchar(128) DEFAULT NULL,
+    `ds_process_definition_code` bigint       DEFAULT NULL,
+    `ds_schedule_id`             int          DEFAULT NULL,
+    `last_trigger_time`          timestamp(3) DEFAULT NULL,
+    `create_user_id`             int          NOT NULL,
+    `update_user_id`             int          DEFAULT NULL,
+    `create_time`                timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `update_time`                timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    `workspace_id`               bigint       NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+CREATE INDEX idx_job_schedule_job_define_id ON t_st_job_schedule (job_define_id);
+

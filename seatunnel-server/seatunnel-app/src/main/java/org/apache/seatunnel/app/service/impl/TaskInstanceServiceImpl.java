@@ -136,6 +136,9 @@ public class TaskInstanceServiceImpl extends SeatunnelBaseServiceImpl
     }
 
     public Date dateConverter(String time) {
+        if (time == null || time.isBlank()) {
+            return null;
+        }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {

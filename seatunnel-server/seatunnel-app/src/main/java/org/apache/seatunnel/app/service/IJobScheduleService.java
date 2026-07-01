@@ -15,18 +15,22 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
+package org.apache.seatunnel.app.service;
 
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US
-  }
-})
+import org.apache.seatunnel.app.domain.request.job.JobScheduleReq;
+import org.apache.seatunnel.app.domain.response.job.JobScheduleRes;
 
-export default i18n
+import java.util.List;
+
+public interface IJobScheduleService {
+
+    JobScheduleRes getByJobDefineId(Long jobDefineId);
+
+    JobScheduleRes saveOrUpdate(Long jobDefineId, JobScheduleReq req);
+
+    void deleteByJobDefineId(Long jobDefineId);
+
+    void setEnabled(Long jobDefineId, boolean enabled);
+
+    List<String> previewCronTimes(String crontab, int count);
+}

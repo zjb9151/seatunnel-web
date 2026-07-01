@@ -24,7 +24,7 @@ import Theme from './theme'
 const Setting = defineComponent({
   name: 'Setting',
   render() {
-    const { t, locale } = useI18n()
+    const { t } = useI18n()
 
     return (
       <NSpace vertical>
@@ -50,28 +50,6 @@ const Setting = defineComponent({
                     useSettingStore().setDataUniqueValue(v)
                   }}
                 />
-              </NSpace>
-            </NListItem>
-          </NList>
-        </NCard>
-        <NCard title={t('setting.language_setting')}>
-          <NList>
-            <NListItem>
-              <NSpace justify='space-between' align='center'>
-                <span>{t('setting.language')}</span>
-                <div class='w-56'>
-                  <NSelect
-                    value={useSettingStore().getLocales}
-                    options={[
-                      { value: 'en_US', label: t('setting.english') },
-                      { value: 'zh_CN', label: t('setting.chinese') }
-                    ]}
-                    onUpdateValue={(l) => {
-                      locale.value = l
-                      useSettingStore().setLocales(l)
-                    }}
-                  />
-                </div>
               </NSpace>
             </NListItem>
           </NList>
