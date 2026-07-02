@@ -161,6 +161,20 @@ public class DatasourceDaoImpl implements IDatasourceDao {
     }
 
     @Override
+    public List<Datasource> queryAllForSystemSync() {
+        return datasourceMapper.selectList(new QueryWrapper<>());
+    }
+
+    @Override
+    public boolean updateDsDatasourceId(Long id, Long workspaceId, Integer dsDatasourceId) {
+        Datasource update = Datasource.builder().id(id).dsDatasourceId(dsDatasourceId).build();
+        return datasourceMapper.update(
+                        update,
+                        new QueryWrapper<Datasource>().eq("id", id).eq("workspace_id", workspaceId))
+                > 0;
+    }
+
+    @Override
     public List<Datasource> selectByIds(List<Long> ids) {
         return datasourceMapper.selectList(
                 new QueryWrapper<Datasource>()

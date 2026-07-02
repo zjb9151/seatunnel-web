@@ -71,6 +71,7 @@ CREATE TABLE t_st_datasource (
                                  create_time TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
                                  update_time TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
                                  workspace_id BIGINT NOT NULL,
+                                 ds_datasource_id INT DEFAULT NULL,
                                  PRIMARY KEY (id),
                                  UNIQUE (datasource_name, workspace_id)
 );

@@ -20,5 +20,7 @@ export default {
   not_configured: 'DolphinScheduler 未配置或未启用',
   load_failed: '加载 DolphinScheduler 信息失败',
   check_config:
-    '请检查 application.yml 中 dolphinscheduler 配置，并确保 DolphinScheduler 服务已启动。'
+    '请检查 application.yml 中 dolphinscheduler 配置，并确保 DolphinScheduler 服务已启动。',
+  datasource_hint:
+    '数据源请在 SeaTunnel「数据源」菜单统一维护，保存后会自动同步到 DolphinScheduler，无需在 DS 中重复配置。'
 }

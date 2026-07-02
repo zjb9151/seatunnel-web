@@ -20,5 +20,7 @@ export default {
   not_configured: 'DolphinScheduler is not configured or enabled',
   load_failed: 'Failed to load DolphinScheduler info',
   check_config:
-    'Check dolphinscheduler settings in application.yml and ensure DolphinScheduler is running.'
+    'Check dolphinscheduler settings in application.yml and ensure DolphinScheduler is running.',
+  datasource_hint:
+    'Manage datasources in SeaTunnel Data Sources only; they are synced to DolphinScheduler automatically.'
 }

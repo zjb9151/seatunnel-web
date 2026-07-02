@@ -69,6 +69,7 @@ CREATE TABLE `t_st_datasource`  (
   `create_time` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `update_time` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `workspace_id` bigint(20) NOT NULL,
+  `ds_datasource_id` int(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `t_st_datasource_datasource_name_uindex`(`datasource_name`, `workspace_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;

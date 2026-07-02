@@ -77,16 +77,18 @@ dolphinscheduler:
   enabled: true
   api-url: http://127.0.0.1:12345/dolphinscheduler
   # API token for schedule sync; also used for embedded UI auth when set
-  token: ""
+  token: "a98280b96608e6ef09c5916cc9aa1037"
   # DS login credentials for embedded UI (used when token is empty)
   username: admin
   password: dolphinscheduler123
   # Embedded UI path (proxied through SeaTunnel Web backend)
   ui-url: /dolphinscheduler/ui/
-  project-code: seatunnel
+  project-code: 177657333175264
   seatunnel-web-url: http://127.0.0.1:8801
-  service-token: ""
+  service-token: "st-web-ds-service-token-2026"
   tenant-code: default
+  # Auto-sync SeaTunnel datasource center to DolphinScheduler (ST is source of truth)
+  sync-datasource: true
 ---
 spring:
   config:

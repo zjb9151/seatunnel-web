@@ -18,11 +18,13 @@
 package org.apache.seatunnel.app.interceptor;
 
 import org.apache.seatunnel.app.common.Constants;
+import org.apache.seatunnel.app.config.DolphinSchedulerProperties;
 import org.apache.seatunnel.app.dal.dao.IUserDao;
 import org.apache.seatunnel.app.dal.entity.User;
 import org.apache.seatunnel.app.dal.entity.UserLoginLog;
 import org.apache.seatunnel.app.security.JwtUtils;
 import org.apache.seatunnel.app.security.UserContext;
+import org.apache.seatunnel.app.security.UserContextHolder;
 import org.apache.seatunnel.common.access.AccessInfo;
 
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +54,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Resource private JwtUtils jwtUtils;
 
+    @Resource private DolphinSchedulerProperties dolphinSchedulerProperties;
+
+    private static final String DS_EXECUTE_PATH = "/seatunnel/api/v1/job/executor/execute";
+
     @Override
     @SuppressWarnings("MagicNumber")
     public boolean preHandle(
@@ -68,6 +74,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         long currentTimestamp = System.currentTimeMillis();
         final String token = request.getHeader(TOKEN);
+        if (isDolphinSchedulerExecute(request) && isValidServiceToken(token)) {
+            bindSchedulerServiceContext(request);
+            return true;
+        }
         if (StringUtils.isBlank(token)) {
             log.info("user does not exist");
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
@@ -120,18 +130,44 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     }
 
     @Override
+    public void afterCompletion(
+            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
+        UserContextHolder.clear();
+    }
+
+    private boolean isDolphinSchedulerExecute(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri != null && uri.contains(DS_EXECUTE_PATH);
+    }
+
+    private boolean isValidServiceToken(String token) {
+        return dolphinSchedulerProperties.isEnabled()
+                && StringUtils.isNotBlank(dolphinSchedulerProperties.getServiceToken())
+                && StringUtils.equals(token, dolphinSchedulerProperties.getServiceToken());
+    }
+
+    private void bindSchedulerServiceContext(HttpServletRequest request) {
+        User user = new User();
+        user.setId(1);
+        user.setUsername("scheduler");
+        UserContext userContext = new UserContext();
+        userContext.setUser(user);
+        userContext.setWorkspaceId(1L);
+        AccessInfo accessInfo = new AccessInfo();
+        accessInfo.setUsername("scheduler");
+        userContext.setAccessInfo(accessInfo);
+        UserContextHolder.setUserContext(userContext);
+        request.setAttribute(Constants.SESSION_USER_CONTEXT, userContext);
+        request.setAttribute("userId", 1);
+    }
+
+    @Override
     public void postHandle(
             HttpServletRequest request,
             HttpServletResponse response,
             Object handler,
             ModelAndView modelAndView)
-            throws Exception {
-        // do nothing
-    }
-
-    @Override
-    public void afterCompletion(
-            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
             throws Exception {
         // do nothing
     }

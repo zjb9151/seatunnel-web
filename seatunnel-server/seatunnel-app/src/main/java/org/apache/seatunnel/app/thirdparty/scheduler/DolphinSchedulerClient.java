@@ -21,7 +21,6 @@ import org.apache.seatunnel.shade.com.fasterxml.jackson.databind.JsonNode;
 
 import org.apache.seatunnel.app.config.DolphinSchedulerProperties;
 import org.apache.seatunnel.common.utils.JsonUtils;
-import org.apache.seatunnel.server.common.CodeGenerateUtils;
 import org.apache.seatunnel.server.common.SeatunnelErrorEnum;
 import org.apache.seatunnel.server.common.SeatunnelException;
 
@@ -83,7 +82,7 @@ public class DolphinSchedulerClient {
                     "dolphinscheduler.service-token is required for HTTP task authentication.");
         }
 
-        long taskCode = generateCode();
+        long taskCode = generateTaskCodeFromDs();
 
         String processName = "seatunnel_" + jobDefineId;
         String executeUrl =
@@ -143,7 +142,8 @@ public class DolphinSchedulerClient {
         form.add("taskDefinitionJson", taskDefinitionJson);
         form.add("taskRelationJson", taskRelationJson);
         form.add("locations", locationsJson);
-        form.add("tenantCode", properties.getTenantCode());
+        form.add("globalParams", "[]");
+        form.add("timeout", "0");
         form.add("executionType", "PARALLEL");
 
         JsonNode data =
@@ -163,7 +163,8 @@ public class DolphinSchedulerClient {
         form.add("taskDefinitionJson", taskDefinitionJson);
         form.add("taskRelationJson", taskRelationJson);
         form.add("locations", locationsJson);
-        form.add("tenantCode", properties.getTenantCode());
+        form.add("globalParams", "[]");
+        form.add("timeout", "0");
         form.add("executionType", "PARALLEL");
         form.add("releaseState", "ONLINE");
 
@@ -254,6 +255,10 @@ public class DolphinSchedulerClient {
         httpParams.add(httpParamToken);
         httpParams.add(httpParamContentType);
 
+        Map<String, Object> conditionResult = new HashMap<>();
+        conditionResult.put("successNode", java.util.Collections.singletonList(""));
+        conditionResult.put("failedNode", java.util.Collections.singletonList(""));
+
         Map<String, Object> taskParams = new HashMap<>();
         taskParams.put("localParams", new ArrayList<>());
         taskParams.put("resourceList", new ArrayList<>());
@@ -264,22 +269,25 @@ public class DolphinSchedulerClient {
         taskParams.put("condition", "");
         taskParams.put("connectTimeout", 60000);
         taskParams.put("socketTimeout", 60000);
+        taskParams.put("dependence", new HashMap<>());
+        taskParams.put("conditionResult", conditionResult);
 
         Map<String, Object> task = new HashMap<>();
         task.put("code", taskCode);
         task.put("name", "seatunnel_execute");
         task.put("version", 1);
         task.put("description", "Trigger SeaTunnel Web job execution");
-        task.put("delayTime", "0");
+        task.put("delayTime", 0);
         task.put("taskType", "HTTP");
         task.put("taskParams", taskParams);
         task.put("flag", "YES");
+        task.put("isCache", "NO");
+        task.put("taskExecuteType", "BATCH");
         task.put("taskPriority", "MEDIUM");
         task.put("workerGroup", "default");
-        task.put("failRetryTimes", "0");
-        task.put("failRetryInterval", "1");
+        task.put("failRetryTimes", 0);
+        task.put("failRetryInterval", 1);
         task.put("timeoutFlag", "CLOSE");
-        task.put("timeoutNotifyStrategy", "");
         task.put("timeout", 0);
         task.put("environmentCode", -1);
 
@@ -382,12 +390,23 @@ public class DolphinSchedulerClient {
         }
     }
 
-    private long generateCode() {
-        try {
-            return CodeGenerateUtils.getInstance().genCode();
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            throw new SeatunnelException(SeatunnelErrorEnum.ILLEGAL_STATE, e.getMessage());
+    private long generateTaskCodeFromDs() {
+        String path =
+                "/projects/"
+                        + properties.getProjectCode()
+                        + "/task-definition/gen-task-codes?genNum=1";
+        HttpHeaders headers = buildHeaders();
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response =
+                restTemplate.exchange(
+                        properties.getApiUrl() + path, HttpMethod.GET, entity, String.class);
+        JsonNode data = parseResponse(response.getBody());
+        if (!data.isArray() || data.isEmpty()) {
+            throw new SeatunnelException(
+                    SeatunnelErrorEnum.ILLEGAL_STATE,
+                    "Failed to generate DolphinScheduler task code");
         }
+        return data.get(0).asLong();
     }
 
     @Data

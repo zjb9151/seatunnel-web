@@ -102,6 +102,8 @@ public class DatasourceServiceImpl extends SeatunnelBaseServiceImpl
 
     @Resource private WorkspaceService workspaceService;
 
+    @Resource private DolphinSchedulerDatasourceSyncService dolphinSchedulerDatasourceSyncService;
+
     @Override
     public String createDatasource(
             String datasourceName,
@@ -140,6 +142,7 @@ public class DatasourceServiceImpl extends SeatunnelBaseServiceImpl
                         .build();
         boolean success = datasourceDao.insertDatasource(datasource);
         if (success) {
+            dolphinSchedulerDatasourceSyncService.syncAfterCreate(datasource);
             return String.valueOf(uuid);
         }
         throw new SeatunnelException(SeatunnelErrorEnum.DATASOURCE_CREATE_FAILED);
@@ -177,7 +180,12 @@ public class DatasourceServiceImpl extends SeatunnelBaseServiceImpl
             String configJson = JsonUtils.toJsonString(datasourceConfig);
             datasource.setDatasourceConfig(configJson);
         }
-        return datasourceDao.updateDatasourceById(datasource);
+        boolean updated = datasourceDao.updateDatasourceById(datasource);
+        if (updated) {
+            Datasource latest = datasourceDao.selectDatasourceById(datasourceId);
+            dolphinSchedulerDatasourceSyncService.syncAfterUpdate(latest);
+        }
+        return updated;
     }
 
     @Override
@@ -200,6 +208,7 @@ public class DatasourceServiceImpl extends SeatunnelBaseServiceImpl
             return true;
         }
         permCheck(datasource.getDatasourceName(), AccessType.DELETE);
+        dolphinSchedulerDatasourceSyncService.syncAfterDelete(datasource);
         return datasourceDao.deleteDatasourceById(datasourceId);
     }
 

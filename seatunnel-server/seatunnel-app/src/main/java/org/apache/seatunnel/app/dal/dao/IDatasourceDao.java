@@ -54,6 +54,12 @@ public interface IDatasourceDao {
 
     List<Datasource> queryAll();
 
+    /** All datasources across workspaces; for background sync (no HTTP user context). */
+    List<Datasource> queryAllForSystemSync();
+
+    /** Update DS datasource mapping by primary key without request user context. */
+    boolean updateDsDatasourceId(Long id, Long workspaceId, Integer dsDatasourceId);
+
     List<Datasource> selectByIds(List<Long> ids);
 
     List<Datasource> selectDatasourceByUserId(int userId);

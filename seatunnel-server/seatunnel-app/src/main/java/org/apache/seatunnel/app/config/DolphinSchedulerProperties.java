@@ -56,4 +56,7 @@ public class DolphinSchedulerProperties {
 
     /** DS login password for embedded UI (used when token is empty) */
     private String password = "dolphinscheduler123";
+
+    /** Sync SeaTunnel datasource center entries to DolphinScheduler automatically */
+    private boolean syncDatasource = true;
 }

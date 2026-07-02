@@ -67,4 +67,7 @@ public class Datasource {
 
     @TableField("workspace_id")
     private Long workspaceId;
+
+    @TableField("ds_datasource_id")
+    private Integer dsDatasourceId;
 }

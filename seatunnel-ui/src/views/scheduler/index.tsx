@@ -84,6 +84,9 @@ const SchedulerIndex = defineComponent({
 
     return (
       <div class={styles.container}>
+        <NAlert type="info" class={styles.hint}>
+          {this.t('scheduler.datasource_hint')}
+        </NAlert>
         <iframe
           class={styles.frame}
           src={this.embedUrl}

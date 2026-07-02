@@ -33,7 +33,7 @@ export default {
     {
       path: '/scheduler',
       name: 'scheduler-index',
-      component: components['scheduler-index'],
+      component: components['scheduler'],
       meta: {
         title: 'scheduler',
         activeMenu: 'scheduler',

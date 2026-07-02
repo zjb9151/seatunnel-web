@@ -22,7 +22,11 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: center;
+}
+
+.hint {
+  margin: 8px 12px 0;
+  flex-shrink: 0;
 }
 
 .frame {
@@ -30,6 +34,7 @@
   width: 100%;
   border: none;
   background: #fff;
+  min-height: 0;
 }
 
 .empty {
