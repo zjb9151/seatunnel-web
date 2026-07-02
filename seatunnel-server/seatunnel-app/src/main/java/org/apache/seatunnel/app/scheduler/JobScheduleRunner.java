@@ -103,7 +103,8 @@ public class JobScheduleRunner {
         try {
             UserContext userContext = new UserContext();
             User user = new User();
-            user.setId(schedule.getCreateUserId());
+            int userId = schedule.getCreateUserId() != null ? schedule.getCreateUserId() : 1;
+            user.setId(userId);
             user.setUsername("scheduler");
             userContext.setUser(user);
             userContext.setWorkspaceId(schedule.getWorkspaceId());

@@ -131,13 +131,18 @@ public class DolphinSchedulerDatasourceSyncService {
     }
 
     private void persistDsDatasourceId(Datasource datasource, int dsId) {
-        if (datasource.getWorkspaceId() != null) {
-            datasourceDao.updateDsDatasourceId(
-                    datasource.getId(), datasource.getWorkspaceId(), dsId);
-        } else {
-            Datasource update =
-                    Datasource.builder().id(datasource.getId()).dsDatasourceId(dsId).build();
-            datasourceDao.updateDatasourceById(update);
+        if (datasource.getId() == null) {
+            log.warn("Skip persisting DS datasource id: SeaTunnel datasource id is null");
+            return;
+        }
+        boolean updated =
+                datasourceDao.updateDsDatasourceId(
+                        datasource.getId(), datasource.getWorkspaceId(), dsId);
+        if (!updated) {
+            log.warn(
+                    "Failed to persist DS datasource id={} for SeaTunnel datasource id={}",
+                    dsId,
+                    datasource.getId());
         }
     }
 

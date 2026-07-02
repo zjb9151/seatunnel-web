@@ -81,14 +81,14 @@ public class DolphinSchedulerProxyFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String requestUri = httpRequest.getRequestURI();
+        String contextPath = httpRequest.getContextPath();
+        String pathWithinApp = requestUri.substring(contextPath.length());
 
-        if (!properties.isEnabled() || !requestUri.startsWith(PROXY_PREFIX)) {
+        if (!properties.isEnabled() || !pathWithinApp.startsWith(PROXY_PREFIX)) {
             chain.doFilter(request, response);
             return;
         }
 
-        String contextPath = httpRequest.getContextPath();
-        String pathWithinApp = requestUri.substring(contextPath.length());
         String suffix = pathWithinApp.substring(PROXY_PREFIX.length());
         if (StringUtils.isEmpty(suffix)) {
             suffix = "/";

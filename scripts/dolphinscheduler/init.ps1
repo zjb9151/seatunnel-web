@@ -6,11 +6,42 @@ param(
     [string]$Username = "admin",
     [string]$Password = "dolphinscheduler123",
     [string]$ProjectName = "seatunnel",
-    [string]$ApplicationYml = "C:\Users\zjbin\Desktop\seatunnel-web\seatunnel-server\seatunnel-app\src\main\resources\application.yml",
+    [string]$ApplicationYml = "",
     [int]$WaitSeconds = 180
 )
 
 $ErrorActionPreference = "Stop"
+
+if (-not $ApplicationYml) {
+    $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "../..")
+    $ApplicationYml = Join-Path $repoRoot "seatunnel-server/seatunnel-app/src/main/resources/application.yml"
+}
+
+function Set-YamlLine {
+    param(
+        [string]$Content,
+        [string]$KeyPattern,
+        [string]$Value,
+        [switch]$Quoted
+    )
+    $pattern = "(?m)^(\s*${KeyPattern}:\s*).*$"
+    if ($Quoted) {
+        return [regex]::Replace(
+            $Content,
+            $pattern,
+            {
+                param($match)
+                $match.Groups[1].Value + '"' + $Value + '"'
+            }.GetNewClosure())
+    }
+    return [regex]::Replace(
+        $Content,
+        $pattern,
+        {
+            param($match)
+            $match.Groups[1].Value + $Value
+        }.GetNewClosure())
+}
 
 function Wait-ForDs {
     param([int]$TimeoutSec)
@@ -94,14 +125,14 @@ Write-Host "API token created."
 
 $serviceToken = -join ((48..57) + (97..102) | Get-Random -Count 32 | ForEach-Object { [char]$_ })
 
-Write-Host "Updating application.yml..."
+Write-Host "Updating application.yml at $ApplicationYml..."
 if (-not (Test-Path $ApplicationYml)) {
     throw "application.yml not found: $ApplicationYml"
 }
 $content = Get-Content $ApplicationYml -Raw -Encoding UTF8
-$content = $content -replace '(?m)^(\s*project-code:\s*).*$', "`${1}$projectCode"
-$content = $content -replace '(?m)^(\s*token:\s*).*$', "`${1}`"$apiToken`""
-$content = $content -replace '(?m)^(\s*service-token:\s*).*$', "`${1}`"$serviceToken`""
+$content = Set-YamlLine -Content $content -KeyPattern "project-code" -Value $projectCode
+$content = Set-YamlLine -Content $content -KeyPattern "token" -Value $apiToken -Quoted
+$content = Set-YamlLine -Content $content -KeyPattern "service-token" -Value $serviceToken -Quoted
 Set-Content -Path $ApplicationYml -Value $content -Encoding UTF8 -NoNewline
 
 Write-Host ""

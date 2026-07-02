@@ -1,12 +1,27 @@
 # Start DolphinScheduler standalone on Windows (no Docker/WSL required).
 # Requires: JDK 8/11/17, extracted apache-dolphinscheduler-*-bin package.
+#
+# Usage:
+#   $env:DOLPHINSCHEDULER_HOME = "C:\path\to\apache-dolphinscheduler-3.2.2-bin"
+#   $env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
+#   .\start.ps1
+# Or:
+#   .\start.ps1 -DsRoot "C:\path\to\apache-dolphinscheduler-3.2.2-bin" -JavaHome "C:\Program Files\Java\jdk-17"
 
 param(
-    [string]$DsRoot = "C:\Users\zjbin\Desktop\apache-dolphinscheduler-3.2.2-bin",
-    [string]$JavaHome = "C:\Program Files\Java\jdk-17"
+    [string]$DsRoot = $env:DOLPHINSCHEDULER_HOME,
+    [string]$JavaHome = $env:JAVA_HOME
 )
 
 $ErrorActionPreference = "Stop"
+
+if (-not $DsRoot) {
+    throw "Set -DsRoot or DOLPHINSCHEDULER_HOME to the extracted apache-dolphinscheduler-*-bin directory."
+}
+if (-not $JavaHome) {
+    throw "Set -JavaHome or JAVA_HOME."
+}
+
 $DsHome = Join-Path $DsRoot "standalone-server"
 $LogDir = Join-Path $DsHome "logs"
 $PidFile = Join-Path $DsHome "pid"
@@ -22,7 +37,7 @@ if ((Get-ChildItem $rootLibs -Filter "*.jar" -ErrorAction SilentlyContinue).Coun
 
 New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
 
-$CpDir = "C:\ds322\cp"
+$CpDir = Join-Path $DsRoot ".cp-cache"
 $CpReady = Join-Path $CpDir ".ready"
 if (-not (Test-Path $CpReady)) {
     Write-Host "Building classpath directory (one-time copy to $CpDir)..."

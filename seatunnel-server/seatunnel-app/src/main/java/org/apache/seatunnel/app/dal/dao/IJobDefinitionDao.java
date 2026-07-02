@@ -31,6 +31,9 @@ public interface IJobDefinitionDao {
 
     JobDefinition getJob(long id);
 
+    /** Load job definition by id without workspace filter (system/scheduler use). */
+    JobDefinition getJobByIdForSystem(long id);
+
     void updateJob(JobDefinition jobDefinition);
 
     PageInfo<JobDefinitionRes> getJob(

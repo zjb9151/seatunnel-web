@@ -108,7 +108,11 @@ export const ScheduleModal = defineComponent({
                 required
               >
                 <CronPicker
-                  key={this.showModalRef ? this.model.crontab : 'hidden'}
+                  key={
+                    this.showModalRef
+                      ? `cron-picker-${this.row?.id ?? 'new'}`
+                      : 'cron-picker-hidden'
+                  }
                   v-model={[this.model.crontab, 'value']}
                 />
               </NFormItem>

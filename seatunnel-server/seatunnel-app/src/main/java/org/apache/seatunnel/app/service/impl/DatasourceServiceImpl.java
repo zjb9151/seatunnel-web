@@ -208,8 +208,11 @@ public class DatasourceServiceImpl extends SeatunnelBaseServiceImpl
             return true;
         }
         permCheck(datasource.getDatasourceName(), AccessType.DELETE);
-        dolphinSchedulerDatasourceSyncService.syncAfterDelete(datasource);
-        return datasourceDao.deleteDatasourceById(datasourceId);
+        boolean deleted = datasourceDao.deleteDatasourceById(datasourceId);
+        if (deleted) {
+            dolphinSchedulerDatasourceSyncService.syncAfterDelete(datasource);
+        }
+        return deleted;
     }
 
     @Override

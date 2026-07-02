@@ -60,6 +60,11 @@ public class JobDefinitionDaoImpl implements IJobDefinitionDao {
     }
 
     @Override
+    public JobDefinition getJobByIdForSystem(long id) {
+        return jobMapper.selectById(id);
+    }
+
+    @Override
     public void updateJob(JobDefinition jobDefinition) {
         jobMapper.update(
                 jobDefinition,

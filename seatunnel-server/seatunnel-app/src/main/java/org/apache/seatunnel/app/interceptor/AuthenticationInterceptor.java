@@ -19,7 +19,9 @@ package org.apache.seatunnel.app.interceptor;
 
 import org.apache.seatunnel.app.common.Constants;
 import org.apache.seatunnel.app.config.DolphinSchedulerProperties;
+import org.apache.seatunnel.app.dal.dao.IJobDefinitionDao;
 import org.apache.seatunnel.app.dal.dao.IUserDao;
+import org.apache.seatunnel.app.dal.entity.JobDefinition;
 import org.apache.seatunnel.app.dal.entity.User;
 import org.apache.seatunnel.app.dal.entity.UserLoginLog;
 import org.apache.seatunnel.app.security.JwtUtils;
@@ -52,6 +54,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Resource private IUserDao userDaoImpl;
 
+    @Resource private IJobDefinitionDao jobDefinitionDao;
+
     @Resource private JwtUtils jwtUtils;
 
     @Resource private DolphinSchedulerProperties dolphinSchedulerProperties;
@@ -74,9 +78,17 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         long currentTimestamp = System.currentTimeMillis();
         final String token = request.getHeader(TOKEN);
-        if (isDolphinSchedulerExecute(request) && isValidServiceToken(token)) {
-            bindSchedulerServiceContext(request);
-            return true;
+        if (isDolphinSchedulerExecute(request)) {
+            if (!isValidServiceToken(token)) {
+                log.info("DolphinScheduler execute endpoint requires a valid service token");
+                response.setStatus(HttpStatus.UNAUTHORIZED_401);
+                return false;
+            }
+            if (bindSchedulerServiceContext(request)) {
+                return true;
+            }
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return false;
         }
         if (StringUtils.isBlank(token)) {
             log.info("user does not exist");
@@ -137,8 +149,23 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     }
 
     private boolean isDolphinSchedulerExecute(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return uri != null && uri.contains(DS_EXECUTE_PATH);
+        if (!"POST".equalsIgnoreCase(request.getMethod())) {
+            return false;
+        }
+        String pathWithinApp = resolvePathWithinApp(request);
+        return pathWithinApp.equals(DS_EXECUTE_PATH) || pathWithinApp.equals(DS_EXECUTE_PATH + "/");
+    }
+
+    private String resolvePathWithinApp(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        if (StringUtils.isBlank(requestUri)) {
+            return "";
+        }
+        String contextPath = StringUtils.defaultString(request.getContextPath());
+        if (StringUtils.isEmpty(contextPath) || !requestUri.startsWith(contextPath)) {
+            return requestUri;
+        }
+        return requestUri.substring(contextPath.length());
     }
 
     private boolean isValidServiceToken(String token) {
@@ -147,19 +174,43 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 && StringUtils.equals(token, dolphinSchedulerProperties.getServiceToken());
     }
 
-    private void bindSchedulerServiceContext(HttpServletRequest request) {
+    private boolean bindSchedulerServiceContext(HttpServletRequest request) {
+        Long jobDefineId = parseJobDefineId(request.getParameter("jobDefineId"));
+        if (jobDefineId == null) {
+            log.warn("DolphinScheduler execute request missing jobDefineId");
+            return false;
+        }
+        JobDefinition jobDefinition = jobDefinitionDao.getJobByIdForSystem(jobDefineId);
+        if (jobDefinition == null || jobDefinition.getWorkspaceId() == null) {
+            log.warn("Job definition not found for scheduler execute: jobDefineId={}", jobDefineId);
+            return false;
+        }
+        int userId = jobDefinition.getCreateUserId() != null ? jobDefinition.getCreateUserId() : 1;
         User user = new User();
-        user.setId(1);
+        user.setId(userId);
         user.setUsername("scheduler");
         UserContext userContext = new UserContext();
         userContext.setUser(user);
-        userContext.setWorkspaceId(1L);
+        userContext.setWorkspaceId(jobDefinition.getWorkspaceId());
         AccessInfo accessInfo = new AccessInfo();
         accessInfo.setUsername("scheduler");
         userContext.setAccessInfo(accessInfo);
         UserContextHolder.setUserContext(userContext);
         request.setAttribute(Constants.SESSION_USER_CONTEXT, userContext);
-        request.setAttribute("userId", 1);
+        request.setAttribute("userId", userId);
+        return true;
+    }
+
+    private Long parseJobDefineId(String jobDefineIdParam) {
+        if (StringUtils.isBlank(jobDefineIdParam)) {
+            return null;
+        }
+        try {
+            return Long.parseLong(jobDefineIdParam.trim());
+        } catch (NumberFormatException e) {
+            log.warn("Invalid jobDefineId in scheduler execute request: {}", jobDefineIdParam);
+            return null;
+        }
     }
 
     @Override
