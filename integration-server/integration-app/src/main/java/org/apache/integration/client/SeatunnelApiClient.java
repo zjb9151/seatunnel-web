@@ -17,16 +17,12 @@
 
 package org.apache.integration.client;
 
-import org.apache.seatunnel.shade.com.fasterxml.jackson.databind.JsonNode;
-
-import org.apache.seatunnel.common.utils.JsonUtils;
-import org.apache.seatunnel.server.common.SeatunnelErrorEnum;
-import org.apache.seatunnel.server.common.SeatunnelException;
-
 import org.apache.commons.lang3.StringUtils;
-
+import org.apache.integration.common.IntegrationErrorEnum;
+import org.apache.integration.common.IntegrationException;
 import org.apache.integration.config.IntegrationProperties;
 import org.apache.integration.domain.response.user.UserSimpleInfoRes;
+import org.apache.integration.utils.JsonHelper;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;
@@ -76,22 +73,22 @@ public class SeatunnelApiClient {
                 restTemplate.exchange(
                         url, HttpMethod.POST, new HttpEntity<>(body, headers), String.class);
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "SeaTunnel job execute failed: HTTP " + response.getStatusCode());
         }
         try {
-            JsonNode root = JsonUtils.stringToJsonNode(response.getBody());
+            JsonNode root = JsonHelper.stringToJsonNode(response.getBody());
             if (root != null && root.path("code").asInt(-1) != 0) {
-                throw new SeatunnelException(
-                        SeatunnelErrorEnum.ILLEGAL_STATE,
+                throw new IntegrationException(
+                        IntegrationErrorEnum.ILLEGAL_STATE,
                         "SeaTunnel job execute failed: " + root.path("msg").asText());
             }
-        } catch (SeatunnelException e) {
+        } catch (IntegrationException e) {
             throw e;
         } catch (Exception e) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Failed to parse SeaTunnel execute response: " + e.getMessage());
         }
     }
@@ -107,23 +104,23 @@ public class SeatunnelApiClient {
                 restTemplate.exchange(
                         url, HttpMethod.POST, new HttpEntity<>(body, headers), String.class);
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "SeaTunnel login failed: HTTP " + response.getStatusCode());
         }
         try {
-            JsonNode root = JsonUtils.stringToJsonNode(response.getBody());
+            JsonNode root = JsonHelper.stringToJsonNode(response.getBody());
             if (root == null || root.path("code").asInt(-1) != 0) {
-                throw new SeatunnelException(
-                        SeatunnelErrorEnum.ILLEGAL_STATE,
+                throw new IntegrationException(
+                        IntegrationErrorEnum.ILLEGAL_STATE,
                         root == null ? "empty response" : root.path("msg").asText("login failed"));
             }
-            return JsonUtils.parseObject(root.path("data").toString(), UserSimpleInfoRes.class);
-        } catch (SeatunnelException e) {
+            return JsonHelper.parseObject(root.path("data").toString(), UserSimpleInfoRes.class);
+        } catch (IntegrationException e) {
             throw e;
         } catch (Exception e) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Failed to parse login response: " + e.getMessage());
         }
     }
@@ -145,8 +142,8 @@ public class SeatunnelApiClient {
     private HttpHeaders jwtHeaders() {
         UserSimpleInfoRes user = loginAsDefaultUser();
         if (user == null || StringUtils.isBlank(user.getToken())) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE, "SeaTunnel login returned no token");
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE, "SeaTunnel login returned no token");
         }
         HttpHeaders headers = new HttpHeaders();
         headers.set("token", user.getToken());

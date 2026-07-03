@@ -1,54 +1,69 @@
 # SeaTunnel + DolphinScheduler Integration Platform
 
-Monorepo layout after reorganization:
+Integration-only monorepo — **no vendor source code**. Official DS / SeaTunnel **release packages** are installed under `runtime/` and managed via UI or API.
 
 ```
-├── config/integration.yml       # Unified configuration
-├── integration-dolphinscheduler/  # DS official source (submodule)
-├── integration-seatunnel/         # SeaTunnel-Web upstream modules
-├── integration-server/            # Orchestrator + unified API (:9000)
-├── integration-web/             # Unified frontend
-└── scripts/                     # build-all.ps1, start.ps1, stop.ps1
+├── config/integration.yml          # Platform config + runtime install paths
+├── integration-server/
+│   ├── bundled/                    # Built-in default official tar.gz (download via script)
+│   └── integration-app/            # Orchestrator + unified API (:9000)
+├── integration-web/                # Unified frontend (+ Runtime version page)
+├── runtime/                        # Installed official releases (gitignored)
+│   ├── dolphinscheduler/{version}/
+│   ├── seatunnel-engine/{version}/
+│   └── seatunnel-web/{version}/
+└── scripts/
 ```
 
 ## Quick Start
 
-1. Edit [config/integration.yml](config/integration.yml) (DS home, Engine home, MySQL, tokens).
-
-2. Build:
-   ```powershell
-   $env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
-   $env:SEATUNNEL_HOME = "C:\path\to\apache-seatunnel-2.3.11"
-   .\scripts\build-all.ps1
-   ```
-
-3. Start (single entry — integration-server manages child processes):
-   ```powershell
-   .\scripts\start.ps1
-   ```
-
-4. Open **http://127.0.0.1:9000**
-
-## Architecture
-
-- **integration-server** reads `config/integration.yml`, starts/monitors DolphinScheduler, SeaTunnel Engine, and seatunnel-app, and exposes `/api/v1/*`.
-- **integration-web** provides unified navigation; ST/DS pages use iframe embeds in MVP.
-- **integration-seatunnel/** and **integration-dolphinscheduler/** remain vendor-clean — no integration patches.
-
-## Dev (frontend only)
-
 ```powershell
-cd integration-web
-npm install
-npm run dev   # http://localhost:9001, proxies /api -> :9000
+Copy-Item config\integration.yml.example config\integration.yml   # if needed
+.\scripts\download-bundled.ps1    # DS + Engine official bins -> integration-server/bundled/
+.\scripts\build-all.ps1
+.\scripts\start.ps1               # extracts bundled -> runtime/, starts DS/ST
 ```
 
-## API Endpoints
+Open **http://127.0.0.1:9000/runtime** for version install / switch / upgrade.
 
-| Path | Description |
-|------|-------------|
-| `GET /api/v1/platform/info` | Platform & service health |
-| `GET /api/v1/ds/info` | DS embed UI info |
-| `GET /api/v1/ds/seatunnel-ui/info` | ST embed UI info |
-| `POST /api/v1/auth/embed` | DS session → ST JWT |
-| `/api/v1/schedules/**` | Job schedule CRUD |
+## Runtime management
+
+| Action | UI | API |
+|--------|-----|-----|
+| List components | `/runtime` page | `GET /api/v1/runtime/components` |
+| Download & install | Download & Install | `POST /api/v1/runtime/{id}/install` |
+| Switch version | Switch | `POST /api/v1/runtime/{id}/switch` |
+| Install local dist | — | `POST /api/v1/runtime/{id}/install-local` |
+
+On startup `integration-server`:
+
+1. Reads `runtime.*` install dirs (default: `runtime/` next to repo root)
+2. Extracts bundled archives from `integration-server/bundled/` if version not installed
+3. Or downloads from Apache if no bundled archive (first bootstrap)
+4. Sets `processes.*.home` and starts DolphinScheduler, SeaTunnel Engine, SeaTunnel-Web
+
+## Config (`runtime` section)
+
+```yaml
+runtime:
+  base-dir: ..                              # repo root
+  bundled-dir: integration-server/bundled
+  dolphinscheduler:
+    install-dir: runtime/dolphinscheduler
+    version: "3.2.2"
+  seatunnel-engine:
+    install-dir: runtime/seatunnel-engine
+    version: "2.3.11"
+  seatunnel-web:
+    install-dir: runtime/seatunnel-web
+    version: "1.0.3-SNAPSHOT"
+```
+
+## Integration code only
+
+| Path | Integration code? |
+|------|-------------------|
+| `integration-server/` | Yes |
+| `integration-web/` | Yes |
+| `runtime/` | Official bins only |
+| `integration-server/bundled/` | Official archives only |

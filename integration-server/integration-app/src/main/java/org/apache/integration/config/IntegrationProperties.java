@@ -17,6 +17,8 @@
 
 package org.apache.integration.config;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,7 @@ import lombok.Data;
 public class IntegrationProperties {
 
     private IntegrationMeta integration = new IntegrationMeta();
+    private Runtime runtime = new Runtime();
     private Processes processes = new Processes();
     private DolphinScheduler dolphinscheduler = new DolphinScheduler();
     private SeatunnelWeb seatunnelWeb = new SeatunnelWeb();
@@ -92,6 +95,34 @@ public class IntegrationProperties {
     }
 
     @Data
+    public static class Runtime {
+        /** Repo / platform root (parent of config/). */
+        private String baseDir = "..";
+        /** Bundled official archives shipped with integration-server. */
+        private String bundledDir = "integration-server/bundled";
+
+        private RuntimeComponent dolphinscheduler =
+                new RuntimeComponent("runtime/dolphinscheduler", "3.2.2");
+        private RuntimeComponent seatunnelEngine =
+                new RuntimeComponent("runtime/seatunnel-engine", "2.3.11");
+        private RuntimeComponent seatunnelWeb =
+                new RuntimeComponent("runtime/seatunnel-web", "1.0.3-SNAPSHOT");
+    }
+
+    @Data
+    public static class RuntimeComponent {
+        private String installDir;
+        private String version;
+
+        public RuntimeComponent() {}
+
+        public RuntimeComponent(String installDir, String version) {
+            this.installDir = installDir;
+            this.version = version;
+        }
+    }
+
+    @Data
     public static class Processes {
         private ProcessConfig dolphinscheduler = new ProcessConfig();
         private EngineProcess seatunnelEngine = new EngineProcess();
@@ -121,11 +152,19 @@ public class IntegrationProperties {
     @Data
     public static class SeatunnelWebProcess {
         private boolean enabled = true;
+        /** Runtime dist directory (conf, libs, ui, datasource). Alias: dist-home in YAML. */
+        private String home = "";
+        /** @deprecated use {@link #home} */
         private String distHome = "";
+
         private String apiUrl = "http://127.0.0.1:8801";
         private boolean autoStart = true;
         private int maxRestarts = 5;
         private long restartDelayMs = 10000;
+
+        public String getEffectiveHome() {
+            return StringUtils.isNotBlank(home) ? home : distHome;
+        }
     }
 
     @Data

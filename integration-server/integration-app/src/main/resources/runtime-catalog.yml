@@ -1,0 +1,36 @@
+#
+# Official runtime release catalog (used for download / upgrade).
+#
+
+components:
+  dolphinscheduler:
+    display-name: DolphinScheduler
+    default-version: "3.2.2"
+    versions:
+      "3.2.2":
+        archive: apache-dolphinscheduler-3.2.2-bin.tar.gz
+        url: https://archive.apache.org/dist/dolphinscheduler/3.2.2/apache-dolphinscheduler-3.2.2-bin.tar.gz
+        extract-dir: apache-dolphinscheduler-3.2.2-bin
+      "3.2.1":
+        archive: apache-dolphinscheduler-3.2.1-bin.tar.gz
+        url: https://archive.apache.org/dist/dolphinscheduler/3.2.1/apache-dolphinscheduler-3.2.1-bin.tar.gz
+        extract-dir: apache-dolphinscheduler-3.2.1-bin
+
+  seatunnel-engine:
+    display-name: SeaTunnel Engine
+    default-version: "2.3.11"
+    versions:
+      "2.3.11":
+        archive: apache-seatunnel-2.3.11-bin.tar.gz
+        url: https://downloads.apache.org/seatunnel/2.3.11/apache-seatunnel-2.3.11-bin.tar.gz
+        extract-dir: apache-seatunnel-2.3.11
+
+  seatunnel-web:
+    display-name: SeaTunnel Web
+    default-version: "1.0.3-SNAPSHOT"
+    versions:
+      "1.0.3-SNAPSHOT":
+        archive: ""
+        url: ""
+        extract-dir: ""
+        note: "Place dist under bundled/ or use install from local path API"

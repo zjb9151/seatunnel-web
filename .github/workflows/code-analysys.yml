@@ -21,7 +21,8 @@ on:
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
-      - 'integration-seatunnel/seatunnel-ui/**'
+      - 'runtime/**'
+      - 'integration-server/bundled/**'
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -1,0 +1,21 @@
+#
+# Pinned vendor runtime versions (official Apache releases).
+# Used by scripts/setup-runtime.ps1 — edit when upgrading.
+#
+
+dolphinscheduler:
+  version: "3.2.2"
+  archive: apache-dolphinscheduler-3.2.2-bin.tar.gz
+  url: https://archive.apache.org/dist/dolphinscheduler/3.2.2/apache-dolphinscheduler-3.2.2-bin.tar.gz
+  extract-dir: apache-dolphinscheduler-3.2.2-bin
+
+seatunnel-engine:
+  version: "2.3.11"
+  archive: apache-seatunnel-2.3.11-bin.tar.gz
+  url: https://downloads.apache.org/seatunnel/2.3.11/apache-seatunnel-2.3.11-bin.tar.gz
+  extract-dir: apache-seatunnel-2.3.11
+
+# SeaTunnel-Web 1.0.3 has no official binary; build once via scripts/install-seatunnel-web.ps1
+seatunnel-web:
+  version: "1.0.3-SNAPSHOT"
+  note: "No official bin for 1.0.3-SNAPSHOT — run .\\scripts\\install-seatunnel-web.ps1 or place dist under vendors/seatunnel-web/"

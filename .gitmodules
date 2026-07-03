@@ -1,4 +1,0 @@
-[submodule "integration-dolphinscheduler"]
-	path = integration-dolphinscheduler
-	url = https://github.com/apache/dolphinscheduler.git
-	branch = 3.2.2-release

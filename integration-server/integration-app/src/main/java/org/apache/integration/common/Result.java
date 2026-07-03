@@ -17,9 +17,6 @@
 
 package org.apache.integration.common;
 
-import org.apache.seatunnel.server.common.SeatunnelErrorEnum;
-import org.apache.seatunnel.server.common.SeatunnelException;
-
 public class Result<T> {
 
     private static final Result<Void> OK = success();
@@ -34,19 +31,19 @@ public class Result<T> {
         this.data = null;
     }
 
-    private Result(SeatunnelErrorEnum errorEnum) {
+    private Result(IntegrationErrorEnum errorEnum) {
         this.code = errorEnum.getCode();
         this.msg = errorEnum.getMsg();
         this.data = null;
     }
 
-    private Result(SeatunnelErrorEnum errorEnum, String... messages) {
+    private Result(IntegrationErrorEnum errorEnum, String... messages) {
         this.code = errorEnum.getCode();
         this.msg = String.format(errorEnum.getTemplate(), messages);
         this.data = null;
     }
 
-    private Result(SeatunnelException e) {
+    private Result(IntegrationException e) {
         this.code = e.getErrorEnum().getCode();
         this.msg = e.getMessage();
         this.data = null;
@@ -68,24 +65,20 @@ public class Result<T> {
         return result;
     }
 
-    public static <T> Result<T> failure(SeatunnelErrorEnum errorEnum) {
-        Result<T> result = new Result<>(errorEnum);
-        return result;
+    public static <T> Result<T> failure(IntegrationErrorEnum errorEnum) {
+        return new Result<>(errorEnum);
     }
 
-    public static <T> Result<T> failure(SeatunnelErrorEnum errorEnum, String... messages) {
-        Result<T> result = new Result<>(errorEnum, messages);
-        return result;
+    public static <T> Result<T> failure(IntegrationErrorEnum errorEnum, String... messages) {
+        return new Result<>(errorEnum, messages);
     }
 
-    public static <T> Result<T> failure(SeatunnelException e) {
-        Result<T> result = new Result<>(e);
-        return result;
+    public static <T> Result<T> failure(IntegrationException e) {
+        return new Result<>(e);
     }
 
     public static <T> Result<T> failure(int code, String msg) {
-        Result<T> result = new Result<>(code, msg);
-        return result;
+        return new Result<>(code, msg);
     }
 
     public boolean isSuccess() {

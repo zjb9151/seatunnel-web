@@ -17,12 +17,11 @@
 
 package org.apache.integration.service.impl;
 
-import org.apache.seatunnel.server.common.CodeGenerateUtils;
-import org.apache.seatunnel.server.common.SeatunnelErrorEnum;
-import org.apache.seatunnel.server.common.SeatunnelException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.integration.client.SeatunnelApiClient;
+import org.apache.integration.common.CodeGenerateUtils;
+import org.apache.integration.common.IntegrationErrorEnum;
+import org.apache.integration.common.IntegrationException;
 import org.apache.integration.dal.dao.IJobScheduleDao;
 import org.apache.integration.dal.entity.JobSchedule;
 import org.apache.integration.domain.request.job.JobScheduleReq;
@@ -69,8 +68,8 @@ public class JobScheduleServiceImpl implements IJobScheduleService {
         validateRequest(jobDefineId, req);
 
         if (!seatunnelApiClient.jobDefinitionExists(jobDefineId)) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.RESOURCE_NOT_FOUND,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.RESOURCE_NOT_FOUND,
                     "Job definition " + jobDefineId + " not found");
         }
 
@@ -145,8 +144,8 @@ public class JobScheduleServiceImpl implements IJobScheduleService {
                         .getByJobDefineId(jobDefineId)
                         .orElseThrow(
                                 () ->
-                                        new SeatunnelException(
-                                                SeatunnelErrorEnum.RESOURCE_NOT_FOUND,
+                                        new IntegrationException(
+                                                IntegrationErrorEnum.RESOURCE_NOT_FOUND,
                                                 "Schedule for job " + jobDefineId + " not found"));
         schedule.setEnabled(enabled ? 1 : 0);
         schedule.setUpdateUserId(RequestContext.getCurrentUserId());
@@ -178,29 +177,31 @@ public class JobScheduleServiceImpl implements IJobScheduleService {
 
     private void validateRequest(Long jobDefineId, JobScheduleReq req) {
         if (jobDefineId == null) {
-            throw new SeatunnelException(SeatunnelErrorEnum.PARAM_CAN_NOT_BE_NULL, "jobDefineId");
+            throw new IntegrationException(
+                    IntegrationErrorEnum.PARAM_CAN_NOT_BE_NULL, "jobDefineId");
         }
         if (req == null) {
-            throw new SeatunnelException(SeatunnelErrorEnum.PARAM_CAN_NOT_BE_NULL, "schedule");
+            throw new IntegrationException(IntegrationErrorEnum.PARAM_CAN_NOT_BE_NULL, "schedule");
         }
         if (StringUtils.isBlank(req.getScheduleName())) {
-            throw new SeatunnelException(SeatunnelErrorEnum.PARAM_CAN_NOT_BE_NULL, "scheduleName");
+            throw new IntegrationException(
+                    IntegrationErrorEnum.PARAM_CAN_NOT_BE_NULL, "scheduleName");
         }
         if (StringUtils.isBlank(req.getCrontab())) {
-            throw new SeatunnelException(SeatunnelErrorEnum.PARAM_CAN_NOT_BE_NULL, "crontab");
+            throw new IntegrationException(IntegrationErrorEnum.PARAM_CAN_NOT_BE_NULL, "crontab");
         }
 
         String scheduleType =
                 StringUtils.defaultIfBlank(req.getScheduleType(), SCHEDULE_TYPE_INTERNAL);
         if (SCHEDULE_TYPE_INTERNAL.equals(scheduleType)
                 && !CronExpression.isValidExpression(req.getCrontab().trim())) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Invalid cron expression for internal scheduler: " + req.getCrontab());
         }
         if (SCHEDULE_TYPE_DOLPHIN.equals(scheduleType) && !dolphinSchedulerClient.isAvailable()) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "DolphinScheduler integration is not enabled or not configured");
         }
     }
@@ -223,12 +224,12 @@ public class JobScheduleServiceImpl implements IJobScheduleService {
     @Override
     public List<String> previewCronTimes(String crontab, int count) {
         if (StringUtils.isBlank(crontab)) {
-            throw new SeatunnelException(SeatunnelErrorEnum.PARAM_CAN_NOT_BE_NULL, "crontab");
+            throw new IntegrationException(IntegrationErrorEnum.PARAM_CAN_NOT_BE_NULL, "crontab");
         }
         String expression = crontab.trim();
         if (!CronExpression.isValidExpression(expression)) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE, "Invalid cron expression: " + expression);
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE, "Invalid cron expression: " + expression);
         }
         int previewCount = Math.min(Math.max(count, 1), 20);
         CronExpression cron = CronExpression.parse(expression);
@@ -249,7 +250,7 @@ public class JobScheduleServiceImpl implements IJobScheduleService {
         try {
             return CodeGenerateUtils.getInstance().genCode();
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            throw new SeatunnelException(SeatunnelErrorEnum.ILLEGAL_STATE, e.getMessage());
+            throw new IntegrationException(IntegrationErrorEnum.ILLEGAL_STATE, e.getMessage());
         }
     }
 }

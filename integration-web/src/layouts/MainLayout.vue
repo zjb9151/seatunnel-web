@@ -29,6 +29,7 @@ const router = useRouter()
 
 const menuOptions = computed<MenuOption[]>(() => [
   { label: t('menu.home'), key: '/home' },
+  { label: 'Runtime', key: '/runtime' },
   { label: t('menu.ds_projects'), key: '/ds/projects' },
   { label: t('menu.ds_workflows'), key: '/ds/workflows' },
   { type: 'divider', key: 'd1' },

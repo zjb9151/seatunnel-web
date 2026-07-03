@@ -10,6 +10,10 @@ const router = createRouter({
       redirect: '/home',
       children: [
         {
+          path: 'runtime',
+          component: () => import('@/views/Runtime.vue')
+        },
+        {
           path: 'home',
           component: () => import('@/views/Home.vue')
         },

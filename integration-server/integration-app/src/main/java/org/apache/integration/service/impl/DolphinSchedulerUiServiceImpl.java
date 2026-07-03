@@ -17,16 +17,13 @@
 
 package org.apache.integration.service.impl;
 
-import org.apache.seatunnel.shade.com.fasterxml.jackson.databind.JsonNode;
-
-import org.apache.seatunnel.common.utils.JsonUtils;
-import org.apache.seatunnel.server.common.SeatunnelErrorEnum;
-import org.apache.seatunnel.server.common.SeatunnelException;
-
 import org.apache.commons.lang3.StringUtils;
+import org.apache.integration.common.IntegrationErrorEnum;
+import org.apache.integration.common.IntegrationException;
 import org.apache.integration.config.IntegrationProperties;
 import org.apache.integration.domain.response.dolphinscheduler.DolphinSchedulerInfoRes;
 import org.apache.integration.service.IDolphinSchedulerUiService;
+import org.apache.integration.utils.JsonHelper;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -37,6 +34,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;
@@ -113,8 +111,8 @@ public class DolphinSchedulerUiServiceImpl implements IDolphinSchedulerUiService
     private String loginAndGetSessionId() {
         if (StringUtils.isBlank(properties.getUsername())
                 || StringUtils.isBlank(properties.getPassword())) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Configure dolphinscheduler.token or dolphinscheduler.username/password");
         }
         String loginUrl =
@@ -127,18 +125,19 @@ public class DolphinSchedulerUiServiceImpl implements IDolphinSchedulerUiService
         ResponseEntity<String> response =
                 restTemplate.postForEntity(loginUrl, new HttpEntity<>(form, headers), String.class);
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "DolphinScheduler login failed with HTTP status "
                             + response.getStatusCode().value());
         }
         try {
-            JsonNode root = JsonUtils.stringToJsonNode(response.getBody());
+            JsonNode root = JsonHelper.stringToJsonNode(response.getBody());
             if (root == null || root.path("code").asInt(-1) != 0) {
                 String msg =
                         root == null ? "empty response" : root.path("msg").asText("login failed");
-                throw new SeatunnelException(
-                        SeatunnelErrorEnum.ILLEGAL_STATE, "DolphinScheduler login failed: " + msg);
+                throw new IntegrationException(
+                        IntegrationErrorEnum.ILLEGAL_STATE,
+                        "DolphinScheduler login failed: " + msg);
             }
             JsonNode data = root.path("data");
             String sessionId = data.path("sessionId").asText(null);
@@ -146,16 +145,16 @@ public class DolphinSchedulerUiServiceImpl implements IDolphinSchedulerUiService
                 sessionId = data.path("token").asText(null);
             }
             if (StringUtils.isBlank(sessionId)) {
-                throw new SeatunnelException(
-                        SeatunnelErrorEnum.ILLEGAL_STATE,
+                throw new IntegrationException(
+                        IntegrationErrorEnum.ILLEGAL_STATE,
                         "DolphinScheduler login response does not contain sessionId");
             }
             return sessionId;
-        } catch (SeatunnelException e) {
+        } catch (IntegrationException e) {
             throw e;
         } catch (Exception e) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Failed to parse DolphinScheduler login response: " + e.getMessage());
         }
     }

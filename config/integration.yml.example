@@ -1,5 +1,5 @@
 #
-# Unified integration platform configuration.
+# Unified integration platform configuration (example).
 #
 
 server:
@@ -9,8 +9,6 @@ integration:
   timezone: Asia/Shanghai
   web-root: ../integration-web/dist
 
-# Official runtime install roots (relative to runtime.base-dir = repo root).
-# On startup integration-server extracts bundled archives or downloads official releases.
 runtime:
   base-dir: ..
   bundled-dir: integration-server/bundled
@@ -27,47 +25,31 @@ runtime:
 processes:
   dolphinscheduler:
     enabled: true
-    home: ""
     api-url: http://127.0.0.1:12345/dolphinscheduler
     auto-start: true
-    health-check-path: /login
-    max-restarts: 5
-    restart-delay-ms: 5000
   seatunnel-engine:
     enabled: true
-    home: ""
     auto-start: true
-    max-restarts: 5
-    restart-delay-ms: 5000
   seatunnel-web:
     enabled: true
-    home: ""
     api-url: http://127.0.0.1:8801
     auto-start: true
-    max-restarts: 5
-    restart-delay-ms: 10000
 
 dolphinscheduler:
-  token: "a98280b96608e6ef09c5916cc9aa1037"
-  project-code: "177657333175264"
+  token: ""
+  project-code: ""
   username: admin
   password: dolphinscheduler123
-  tenant-code: default
-  sync-datasource: false
-  use-ds-datasource: true
 
 seatunnel-web:
-  service-token: "st-web-ds-service-token-2026"
+  service-token: ""
   jwt-secret: seatunnel-web-jwt-secret-key-2026
   ui-path: /seatunnel-ui
 
 spring:
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: Asia/Shanghai
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.50.216:3306/integration?useSSL=false&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://127.0.0.1:3306/integration?useSSL=false&serverTimezone=Asia/Shanghai
     username: seatunnel
     password: seatunnel
 

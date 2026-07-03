@@ -23,3 +23,15 @@ export function getSeatunnelUiInfo() {
 export function getDsUiInfo() {
   return request.get('/ds/info')
 }
+
+export function getRuntimeComponents() {
+  return request.get('/runtime/components')
+}
+
+export function installRuntimeVersion(componentId: string, version: string) {
+  return request.post(`/runtime/${componentId}/install`, { version })
+}
+
+export function switchRuntimeVersion(componentId: string, version: string) {
+  return request.post(`/runtime/${componentId}/switch`, { version })
+}

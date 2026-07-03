@@ -17,14 +17,11 @@
 
 package org.apache.integration.thirdparty.scheduler;
 
-import org.apache.seatunnel.shade.com.fasterxml.jackson.databind.JsonNode;
-
-import org.apache.seatunnel.common.utils.JsonUtils;
-import org.apache.seatunnel.server.common.SeatunnelErrorEnum;
-import org.apache.seatunnel.server.common.SeatunnelException;
-
 import org.apache.commons.lang3.StringUtils;
+import org.apache.integration.common.IntegrationErrorEnum;
+import org.apache.integration.common.IntegrationException;
 import org.apache.integration.config.IntegrationProperties;
+import org.apache.integration.utils.JsonHelper;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +33,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,14 +69,14 @@ public class DolphinSchedulerClient {
             Long existingProcessCode,
             Integer existingScheduleId) {
         if (!isAvailable()) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "DolphinScheduler is not configured. Set dolphinscheduler.enabled=true and "
                             + "configure api-url, token, service-token in application.yml.");
         }
         if (StringUtils.isBlank(properties.getServiceToken())) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "dolphinscheduler.service-token is required for HTTP task authentication.");
         }
 
@@ -237,7 +235,7 @@ public class DolphinSchedulerClient {
         schedule.put("endTime", now.plusYears(10).format(DS_DATE_FORMAT));
         schedule.put("crontab", crontab);
         schedule.put("timezoneId", "Asia/Shanghai");
-        return JsonUtils.toJsonString(schedule);
+        return JsonHelper.toJsonString(schedule);
     }
 
     private String buildTaskDefinitionJson(long taskCode, String executeUrl) {
@@ -293,7 +291,7 @@ public class DolphinSchedulerClient {
 
         List<Map<String, Object>> tasks = new ArrayList<>();
         tasks.add(task);
-        return JsonUtils.toJsonString(tasks);
+        return JsonHelper.toJsonString(tasks);
     }
 
     private String buildTaskRelationJson(long taskCode) {
@@ -308,7 +306,7 @@ public class DolphinSchedulerClient {
 
         List<Map<String, Object>> relations = new ArrayList<>();
         relations.add(relation);
-        return JsonUtils.toJsonString(relations);
+        return JsonHelper.toJsonString(relations);
     }
 
     private String buildLocationsJson(long taskCode) {
@@ -319,7 +317,7 @@ public class DolphinSchedulerClient {
 
         List<Map<String, Object>> locations = new ArrayList<>();
         locations.add(location);
-        return JsonUtils.toJsonString(locations);
+        return JsonHelper.toJsonString(locations);
     }
 
     private JsonNode postForm(String path, MultiValueMap<String, String> form) {
@@ -368,24 +366,24 @@ public class DolphinSchedulerClient {
 
     private JsonNode parseResponse(String body) {
         try {
-            JsonNode root = JsonUtils.stringToJsonNode(body);
+            JsonNode root = JsonHelper.stringToJsonNode(body);
             if (root == null) {
-                throw new SeatunnelException(
-                        SeatunnelErrorEnum.ILLEGAL_STATE, "Empty response from DolphinScheduler");
+                throw new IntegrationException(
+                        IntegrationErrorEnum.ILLEGAL_STATE, "Empty response from DolphinScheduler");
             }
             int code = root.path("code").asInt(-1);
             if (code != 0) {
                 String msg = root.path("msg").asText("Unknown DolphinScheduler error");
                 log.error("DolphinScheduler API error: {}", body);
-                throw new SeatunnelException(SeatunnelErrorEnum.ILLEGAL_STATE, msg);
+                throw new IntegrationException(IntegrationErrorEnum.ILLEGAL_STATE, msg);
             }
             return root.path("data");
         } catch (Exception e) {
-            if (e instanceof SeatunnelException) {
-                throw (SeatunnelException) e;
+            if (e instanceof IntegrationException) {
+                throw (IntegrationException) e;
             }
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Failed to parse DolphinScheduler response: " + e.getMessage());
         }
     }
@@ -402,8 +400,8 @@ public class DolphinSchedulerClient {
                         properties.getApiUrl() + path, HttpMethod.GET, entity, String.class);
         JsonNode data = parseResponse(response.getBody());
         if (!data.isArray() || data.isEmpty()) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Failed to generate DolphinScheduler task code");
         }
         return data.get(0).asLong();

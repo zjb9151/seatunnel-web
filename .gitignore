@@ -64,3 +64,6 @@ spark-warehouse
 /${project.basedir}/
 /seatunnel-web-dist/
 /integration-web/.env.local
+/runtime/
+/integration-server/bundled/*
+!/integration-server/bundled/README.md

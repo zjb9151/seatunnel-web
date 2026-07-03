@@ -19,6 +19,7 @@ package org.apache.integration.process;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.integration.config.IntegrationProperties;
+import org.apache.integration.runtime.RuntimeInstallService;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -42,11 +43,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProcessSupervisor {
 
     @Resource private IntegrationProperties properties;
+    @Resource private RuntimeInstallService runtimeInstallService;
 
     private final Map<String, ManagedProcess> processes = new ConcurrentHashMap<>();
 
     @EventListener(ApplicationReadyEvent.class)
     public void onReady() {
+        runtimeInstallService.bootstrapDefaults();
         startManagedProcesses();
     }
 
@@ -160,9 +163,9 @@ public class ProcessSupervisor {
     }
 
     private void startSeatunnelWeb() {
-        String distHome = properties.getProcesses().getSeatunnelWeb().getDistHome();
+        String distHome = properties.getProcesses().getSeatunnelWeb().getEffectiveHome();
         if (StringUtils.isBlank(distHome)) {
-            log.warn("seatunnel-web dist-home not configured, skip auto-start");
+            log.warn("seatunnel-web home not configured, skip auto-start");
             return;
         }
         Path base = Paths.get(distHome).toAbsolutePath().normalize();

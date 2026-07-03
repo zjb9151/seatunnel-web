@@ -17,15 +17,11 @@
 
 package org.apache.integration.thirdparty.scheduler;
 
-import org.apache.seatunnel.shade.com.fasterxml.jackson.databind.JsonNode;
-import org.apache.seatunnel.shade.com.fasterxml.jackson.databind.node.ArrayNode;
-
-import org.apache.seatunnel.common.utils.JsonUtils;
-import org.apache.seatunnel.server.common.SeatunnelErrorEnum;
-import org.apache.seatunnel.server.common.SeatunnelException;
-
 import org.apache.commons.lang3.StringUtils;
+import org.apache.integration.common.IntegrationErrorEnum;
+import org.apache.integration.common.IntegrationException;
 import org.apache.integration.config.IntegrationProperties;
+import org.apache.integration.utils.JsonHelper;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +30,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;
@@ -55,8 +53,8 @@ public class DolphinSchedulerSessionClient {
 
     public String resolveUsername(String sessionId) {
         if (StringUtils.isBlank(sessionId)) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE, "DolphinScheduler sessionId is required");
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE, "DolphinScheduler sessionId is required");
         }
         if (StringUtils.isNotBlank(properties.getToken())
                 && StringUtils.equals(sessionId.trim(), properties.getToken().trim())) {
@@ -76,8 +74,8 @@ public class DolphinSchedulerSessionClient {
             username = data.path("username").asText(null);
         }
         if (StringUtils.isBlank(username)) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Unable to resolve DolphinScheduler user from session");
         }
         return username;
@@ -117,22 +115,22 @@ public class DolphinSchedulerSessionClient {
 
     private JsonNode parseResponse(String body) {
         try {
-            JsonNode root = JsonUtils.stringToJsonNode(body);
+            JsonNode root = JsonHelper.stringToJsonNode(body);
             if (root == null) {
-                throw new SeatunnelException(
-                        SeatunnelErrorEnum.ILLEGAL_STATE, "Empty response from DolphinScheduler");
+                throw new IntegrationException(
+                        IntegrationErrorEnum.ILLEGAL_STATE, "Empty response from DolphinScheduler");
             }
             int code = root.path("code").asInt(-1);
             if (code != 0) {
                 String msg = root.path("msg").asText("Unknown DolphinScheduler error");
-                throw new SeatunnelException(SeatunnelErrorEnum.ILLEGAL_STATE, msg);
+                throw new IntegrationException(IntegrationErrorEnum.ILLEGAL_STATE, msg);
             }
             return root.path("data");
-        } catch (SeatunnelException e) {
+        } catch (IntegrationException e) {
             throw e;
         } catch (Exception e) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE,
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE,
                     "Failed to parse DolphinScheduler response: " + e.getMessage());
         }
     }

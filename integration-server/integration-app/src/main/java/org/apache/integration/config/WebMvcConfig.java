@@ -17,6 +17,8 @@
 
 package org.apache.integration.config;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -24,8 +26,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -34,21 +36,39 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path webRoot =
-                Paths.get(properties.getIntegration().getWebRoot()).toAbsolutePath().normalize();
+        Path webRoot = Path.of(properties.getIntegration().getWebRoot()).normalize();
         registry.addResourceHandler("/**")
                 .addResourceLocations("file:" + webRoot + "/")
                 .resourceChain(true);
-        registry.addResourceHandler("/seatunnel-ui/**")
-                .addResourceLocations("file:../ui/")
-                .resourceChain(true);
-        registry.addResourceHandler("/ds-ui/**")
-                .addResourceLocations("file:../dolphinscheduler-ui-dist/")
-                .resourceChain(true);
+
+        String uiPath = properties.getSeatunnelUiUrl();
+        if (StringUtils.isBlank(uiPath)) {
+            uiPath = "/seatunnel-ui";
+        }
+        if (!uiPath.startsWith("/")) {
+            uiPath = "/" + uiPath;
+        }
+        String uiPrefix = uiPath.endsWith("/") ? uiPath + "**" : uiPath + "/**";
+
+        Path stUiDir = resolveSeatunnelUiDir();
+        if (stUiDir != null && Files.isDirectory(stUiDir)) {
+            registry.addResourceHandler(uiPrefix)
+                    .addResourceLocations("file:" + stUiDir + "/")
+                    .resourceChain(true);
+        }
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("forward:/index.html");
+    }
+
+    private Path resolveSeatunnelUiDir() {
+        String home = properties.getProcesses().getSeatunnelWeb().getEffectiveHome();
+        if (StringUtils.isBlank(home)) {
+            return null;
+        }
+        Path ui = Path.of(home, "ui");
+        return Files.isDirectory(ui) ? ui : null;
     }
 }

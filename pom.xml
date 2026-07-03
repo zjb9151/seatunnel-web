@@ -33,12 +33,6 @@
     <description>Production ready big data processing product based on Apache Spark and Apache Flink.</description>
 
     <modules>
-        <module>integration-seatunnel/seatunnel-web-common</module>
-        <module>integration-seatunnel/seatunnel-server</module>
-        <module>integration-seatunnel/seatunnel-datasource</module>
-        <module>integration-seatunnel/seatunnel-web-dist</module>
-        <module>integration-seatunnel/seatunnel-web-it</module>
-        <module>integration-seatunnel/seatunnel-mpack</module>
         <module>integration-server</module>
     </modules>
 

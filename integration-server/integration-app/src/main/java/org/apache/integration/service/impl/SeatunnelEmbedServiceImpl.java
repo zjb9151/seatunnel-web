@@ -17,17 +17,16 @@
 
 package org.apache.integration.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.integration.client.SeatunnelApiClient;
+import org.apache.integration.common.IntegrationErrorEnum;
+import org.apache.integration.common.IntegrationException;
 import org.apache.integration.config.IntegrationProperties;
 import org.apache.integration.domain.request.embed.EmbedAuthReq;
 import org.apache.integration.domain.response.dolphinscheduler.SeatunnelUiInfoRes;
 import org.apache.integration.domain.response.user.UserSimpleInfoRes;
 import org.apache.integration.service.ISeatunnelEmbedService;
 import org.apache.integration.thirdparty.scheduler.DolphinSchedulerSessionClient;
-import org.apache.seatunnel.server.common.SeatunnelErrorEnum;
-import org.apache.seatunnel.server.common.SeatunnelException;
-
-import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.stereotype.Service;
 
@@ -46,8 +45,7 @@ public class SeatunnelEmbedServiceImpl implements ISeatunnelEmbedService {
     @Override
     public SeatunnelUiInfoRes getUiInfo() {
         if (!properties.isEnabled()) {
-            return new SeatunnelUiInfoRes(
-                    false, null, "DolphinScheduler integration is disabled.");
+            return new SeatunnelUiInfoRes(false, null, "DolphinScheduler integration is disabled.");
         }
         return new SeatunnelUiInfoRes(true, resolveSeatunnelUiUrl(), "SeaTunnel UI is ready.");
     }
@@ -55,12 +53,12 @@ public class SeatunnelEmbedServiceImpl implements ISeatunnelEmbedService {
     @Override
     public UserSimpleInfoRes exchangeDsSession(EmbedAuthReq req) {
         if (!properties.isEnabled()) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE, "DolphinScheduler integration is disabled");
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE, "DolphinScheduler integration is disabled");
         }
         if (req == null || StringUtils.isBlank(req.getDsSessionId())) {
-            throw new SeatunnelException(
-                    SeatunnelErrorEnum.ILLEGAL_STATE, "dsSessionId is required");
+            throw new IntegrationException(
+                    IntegrationErrorEnum.ILLEGAL_STATE, "dsSessionId is required");
         }
         String username = dolphinSchedulerSessionClient.resolveUsername(req.getDsSessionId());
         log.debug("DS embed auth for user {}", username);
