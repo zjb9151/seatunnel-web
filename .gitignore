@@ -55,3 +55,5 @@ spark-warehouse
 /seatunnel-web-it/profile/*
 /profile/
 /data/
+/dolphinscheduler/
+/ui/

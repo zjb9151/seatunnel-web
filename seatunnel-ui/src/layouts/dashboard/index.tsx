@@ -26,11 +26,13 @@ import {
 } from 'naive-ui'
 import Header from './header'
 import Sidebar from './sidebar'
+import { isEmbedMode } from '@/utils/embed'
 
 const Dashboard = defineComponent({
   setup() {
     window.$message = useMessage()
     const route = useRoute()
+    const embedded = isEmbedMode()
     let showSide = ref(false)
     let fullContent = ref(false)
 
@@ -39,8 +41,8 @@ const Dashboard = defineComponent({
     watch(
       () => route,
       () => {
-        showSide.value = route?.meta?.showSide as boolean
-        fullContent.value = route?.meta?.fullContent as boolean
+        showSide.value = !embedded && (route?.meta?.showSide as boolean)
+        fullContent.value = embedded || (route?.meta?.fullContent as boolean)
         menuKey.value = route.meta.activeSide as string
       },
       {
@@ -49,12 +51,23 @@ const Dashboard = defineComponent({
       }
     )
     return {
+      embedded,
       showSide,
       fullContent,
       menuKey
     }
   },
   render() {
+    if (this.embedded) {
+      return (
+        <NLayout style={{ height: '100vh' }}>
+          <NLayoutContent native-scrollbar={false} style={{ height: '100%' }}>
+            <router-view key={this['$route'].fullPath} />
+          </NLayoutContent>
+        </NLayout>
+      )
+    }
+
     return (
       <NLayout>
         <NLayoutHeader bordered>

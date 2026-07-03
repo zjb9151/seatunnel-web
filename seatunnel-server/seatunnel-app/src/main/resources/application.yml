@@ -87,8 +87,12 @@ dolphinscheduler:
   seatunnel-web-url: http://127.0.0.1:8801
   service-token: "st-web-ds-service-token-2026"
   tenant-code: default
-  # Auto-sync SeaTunnel datasource center to DolphinScheduler (ST is source of truth)
-  sync-datasource: true
+  # SeaTunnel UI URL embedded in DolphinScheduler pages
+  seatunnel-ui-url: /ui
+  # Prefer DolphinScheduler datasource center for SeaTunnel tasks
+  use-ds-datasource: true
+  # Auto-sync SeaTunnel datasource center to DolphinScheduler (disable when DS is source of truth)
+  sync-datasource: false
 ---
 spring:
   config:

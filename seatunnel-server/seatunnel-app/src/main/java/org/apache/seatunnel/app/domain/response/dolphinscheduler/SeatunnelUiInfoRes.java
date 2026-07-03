@@ -15,33 +15,21 @@
  * limitations under the License.
  */
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-import i18n from '@/locales'
-import router from './router'
-import utils from '@/utils'
-import './index.css'
-import './assets/styles/default.scss'
-import { bootstrapEmbedAuth } from '@/utils/embed'
+package org.apache.seatunnel.app.domain.response.dolphinscheduler;
 
-const meta = document.createElement('meta')
-meta.name = 'naive-ui-style'
-document.head.appendChild(meta)
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-const app = createApp(App)
-const pinia = createPinia()
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SeatunnelUiInfoRes {
 
-pinia.use(piniaPluginPersistedstate)
-app.config.globalProperties.trim = utils.trim
+    private boolean enabled;
 
-app.use(pinia)
-app.use(router)
-app.use(i18n)
+    /** Relative or absolute SeaTunnel UI base URL, e.g. /ui or http://127.0.0.1:5173 */
+    private String embedBaseUrl;
 
-bootstrapEmbedAuth()
-  .catch(() => undefined)
-  .finally(() => {
-    app.mount('#app')
-  })
+    private String message;
+}

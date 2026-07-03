@@ -59,4 +59,12 @@ public class DolphinSchedulerProperties {
 
     /** Sync SeaTunnel datasource center entries to DolphinScheduler automatically */
     private boolean syncDatasource = true;
+
+    /**
+     * SeaTunnel UI base URL for embedding in DolphinScheduler, e.g. /ui or http://127.0.0.1:5173
+     */
+    private String seatunnelUiUrl = "/ui";
+
+    /** When true, datasource listing prefers DolphinScheduler datasource center */
+    private boolean useDsDatasource = true;
 }

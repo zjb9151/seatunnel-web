@@ -15,33 +15,15 @@
  * limitations under the License.
  */
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-import i18n from '@/locales'
-import router from './router'
-import utils from '@/utils'
-import './index.css'
-import './assets/styles/default.scss'
-import { bootstrapEmbedAuth } from '@/utils/embed'
+package org.apache.seatunnel.app.service;
 
-const meta = document.createElement('meta')
-meta.name = 'naive-ui-style'
-document.head.appendChild(meta)
+import org.apache.seatunnel.app.domain.request.embed.EmbedAuthReq;
+import org.apache.seatunnel.app.domain.response.dolphinscheduler.SeatunnelUiInfoRes;
+import org.apache.seatunnel.app.domain.response.user.UserSimpleInfoRes;
 
-const app = createApp(App)
-const pinia = createPinia()
+public interface ISeatunnelEmbedService {
 
-pinia.use(piniaPluginPersistedstate)
-app.config.globalProperties.trim = utils.trim
+    SeatunnelUiInfoRes getUiInfo();
 
-app.use(pinia)
-app.use(router)
-app.use(i18n)
-
-bootstrapEmbedAuth()
-  .catch(() => undefined)
-  .finally(() => {
-    app.mount('#app')
-  })
+    UserSimpleInfoRes exchangeDsSession(EmbedAuthReq req);
+}

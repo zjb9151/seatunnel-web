@@ -18,12 +18,12 @@
 package org.apache.seatunnel.app.controller;
 
 import org.apache.seatunnel.app.common.Result;
-import org.apache.seatunnel.app.domain.response.dolphinscheduler.DolphinSchedulerInfoRes;
-import org.apache.seatunnel.app.domain.response.dolphinscheduler.SeatunnelUiInfoRes;
-import org.apache.seatunnel.app.service.IDolphinSchedulerUiService;
+import org.apache.seatunnel.app.domain.request.embed.EmbedAuthReq;
+import org.apache.seatunnel.app.domain.response.user.UserSimpleInfoRes;
 import org.apache.seatunnel.app.service.ISeatunnelEmbedService;
 
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,22 +32,16 @@ import io.swagger.annotations.ApiOperation;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/seatunnel/api/v1/dolphinscheduler")
-public class DolphinSchedulerController {
-
-    @Resource private IDolphinSchedulerUiService dolphinSchedulerUiService;
+@RequestMapping("/seatunnel/api/v1/embed")
+public class EmbedAuthController {
 
     @Resource private ISeatunnelEmbedService seatunnelEmbedService;
 
-    @GetMapping("/info")
-    @ApiOperation(value = "Get DolphinScheduler embed UI info", httpMethod = "GET")
-    public Result<DolphinSchedulerInfoRes> getUiInfo() {
-        return Result.success(dolphinSchedulerUiService.getUiInfo());
-    }
-
-    @GetMapping("/seatunnel-ui/info")
-    @ApiOperation(value = "Get SeaTunnel embed UI info for DolphinScheduler", httpMethod = "GET")
-    public Result<SeatunnelUiInfoRes> getSeatunnelUiInfo() {
-        return Result.success(seatunnelEmbedService.getUiInfo());
+    @PostMapping("/auth")
+    @ApiOperation(
+            value = "Exchange DolphinScheduler session for SeaTunnel JWT",
+            httpMethod = "POST")
+    public Result<UserSimpleInfoRes> exchangeDsSession(@RequestBody EmbedAuthReq req) {
+        return Result.success(seatunnelEmbedService.exchangeDsSession(req));
     }
 }

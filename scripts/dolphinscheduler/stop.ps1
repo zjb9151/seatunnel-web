@@ -18,10 +18,10 @@ if (-not $DsRoot) {
 
 $PidFile = Join-Path (Join-Path $DsRoot "standalone-server") "pid"
 if (Test-Path $PidFile) {
-    $pid = [int](Get-Content $PidFile -Raw)
-    if (Get-Process -Id $pid -ErrorAction SilentlyContinue) {
-        Stop-Process -Id $pid -Force
-        Write-Host "Stopped DolphinScheduler PID $pid"
+    $dsPid = [int](Get-Content $PidFile -Raw)
+    if (Get-Process -Id $dsPid -ErrorAction SilentlyContinue) {
+        Stop-Process -Id $dsPid -Force
+        Write-Host "Stopped DolphinScheduler PID $dsPid"
     }
     Remove-Item $PidFile -Force
 } else {

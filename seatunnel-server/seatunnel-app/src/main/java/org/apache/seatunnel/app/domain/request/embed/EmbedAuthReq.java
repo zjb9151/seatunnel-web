@@ -15,33 +15,12 @@
  * limitations under the License.
  */
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-import i18n from '@/locales'
-import router from './router'
-import utils from '@/utils'
-import './index.css'
-import './assets/styles/default.scss'
-import { bootstrapEmbedAuth } from '@/utils/embed'
+package org.apache.seatunnel.app.domain.request.embed;
 
-const meta = document.createElement('meta')
-meta.name = 'naive-ui-style'
-document.head.appendChild(meta)
+import lombok.Data;
 
-const app = createApp(App)
-const pinia = createPinia()
+@Data
+public class EmbedAuthReq {
 
-pinia.use(piniaPluginPersistedstate)
-app.config.globalProperties.trim = utils.trim
-
-app.use(pinia)
-app.use(router)
-app.use(i18n)
-
-bootstrapEmbedAuth()
-  .catch(() => undefined)
-  .finally(() => {
-    app.mount('#app')
-  })
+    private String dsSessionId;
+}

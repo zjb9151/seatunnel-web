@@ -76,6 +76,8 @@ public class SeatunnelWebAdapter implements WebMvcConfigurer {
                 .excludePathPatterns(
                         LOGIN_PATH_PATTERN,
                         REGISTER_PATH_PATTERN,
+                        "/seatunnel/api/v1/embed/**",
+                        "/seatunnel/api/v1/dolphinscheduler/seatunnel-ui/info",
                         RESOURCE_NAME_PATH_PATTERN,
                         "/swagger-resources/**",
                         "/webjars/**",
