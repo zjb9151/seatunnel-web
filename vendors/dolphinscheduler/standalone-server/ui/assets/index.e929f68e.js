@@ -1,0 +1,1 @@
+import{s}from"./service.fee0e42c.js";function o(e,t){return s({url:`/projects/${t}/executors/execute`,method:"post",data:e})}function c(e,t){return s({url:`/projects/${t}/executors/execute-task`,method:"post",data:e})}function u(e,t){return s({url:`/projects/${t}/executors/start-process-instance`,method:"post",data:e})}export{o as a,c as e,u as s};
