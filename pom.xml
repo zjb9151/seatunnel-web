@@ -33,12 +33,13 @@
     <description>Production ready big data processing product based on Apache Spark and Apache Flink.</description>
 
     <modules>
-        <module>seatunnel-web-common</module>
-        <module>seatunnel-server</module>
-        <module>seatunnel-datasource</module>
-        <module>seatunnel-web-dist</module>
-        <module>seatunnel-web-it</module>
-        <module>seatunnel-mpack</module>
+        <module>integration-seatunnel/seatunnel-web-common</module>
+        <module>integration-seatunnel/seatunnel-server</module>
+        <module>integration-seatunnel/seatunnel-datasource</module>
+        <module>integration-seatunnel/seatunnel-web-dist</module>
+        <module>integration-seatunnel/seatunnel-web-it</module>
+        <module>integration-seatunnel/seatunnel-mpack</module>
+        <module>integration-server</module>
     </modules>
 
     <properties>
@@ -1399,7 +1400,7 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${maven-license-maven-plugin}</version>
                     <configuration>
-                        <outputDirectory>${project.basedir}/seatunnel-web-dist/target/</outputDirectory>
+                        <outputDirectory>${project.basedir}/integration-seatunnel/seatunnel-web-dist/target/</outputDirectory>
                         <thirdPartyFilename>THIRD-PARTY.txt</thirdPartyFilename>
                         <sortArtifactByName>false</sortArtifactByName>
                         <useMissingFile>false</useMissingFile>

@@ -1,4 +1,4 @@
-# Clone Apache DolphinScheduler source into ./dolphinscheduler (3.2.2-release).
+# Clone Apache DolphinScheduler source into ./integration-dolphinscheduler (3.2.2-release).
 #
 # Usage (from repo root):
 #   .\scripts\dolphinscheduler\clone-source.ps1
@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "../..")
 if (-not $TargetDir) {
-    $TargetDir = Join-Path $repoRoot "dolphinscheduler"
+    $TargetDir = Join-Path $repoRoot "integration-dolphinscheduler"
 }
 
 if (Test-Path (Join-Path $TargetDir ".git")) {

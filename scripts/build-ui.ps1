@@ -60,7 +60,10 @@ function Invoke-PnpmBuild {
 }
 
 if (-not $SkipSt) {
-    $stUi = Join-Path $repoRoot "seatunnel-ui"
+    $stUi = Join-Path $repoRoot "integration-seatunnel/seatunnel-ui"
+    if (-not (Test-Path $stUi)) {
+        throw "SeaTunnel UI not found at integration-seatunnel/seatunnel-ui"
+    }
     $stDist = Join-Path $stUi "dist"
     $stTarget = Join-Path $repoRoot "ui"
 
@@ -78,7 +81,7 @@ if (-not $SkipSt) {
 }
 
 if (-not $SkipDs) {
-    $dsUi = Join-Path $repoRoot "dolphinscheduler/dolphinscheduler-ui"
+    $dsUi = Join-Path $repoRoot "integration-dolphinscheduler/dolphinscheduler-ui"
     if (-not (Test-Path $dsUi)) {
         Write-Host "[DS UI] Source not found. Run scripts/dolphinscheduler/clone-source.ps1 first."
     } else {

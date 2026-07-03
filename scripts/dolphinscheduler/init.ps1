@@ -14,7 +14,7 @@ $ErrorActionPreference = "Stop"
 
 if (-not $ApplicationYml) {
     $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "../..")
-    $ApplicationYml = Join-Path $repoRoot "seatunnel-server/seatunnel-app/src/main/resources/application.yml"
+    $ApplicationYml = Join-Path $repoRoot "config/integration.yml"
 }
 
 function Set-YamlLine {
@@ -125,7 +125,7 @@ Write-Host "API token created."
 
 $serviceToken = -join ((48..57) + (97..102) | Get-Random -Count 32 | ForEach-Object { [char]$_ })
 
-Write-Host "Updating application.yml at $ApplicationYml..."
+Write-Host "Updating config/integration.yml at $ApplicationYml..."
 if (-not (Test-Path $ApplicationYml)) {
     throw "application.yml not found: $ApplicationYml"
 }
@@ -141,4 +141,4 @@ Write-Host "DS UI:      http://127.0.0.1:12345/dolphinscheduler/ui"
 Write-Host "Login:      $Username / $Password"
 Write-Host "Project:    $ProjectName (code=$projectCode)"
 Write-Host "API token:  $apiToken"
-Write-Host "Service token updated in application.yml (restart SeaTunnel Web backend to apply)."
+Write-Host "Service token updated in config/integration.yml (restart integration-server to apply)."

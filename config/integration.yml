@@ -1,0 +1,61 @@
+#
+# Unified integration platform configuration.
+# Override path: -Dconfig.path=/path/to/integration.yml
+#
+
+server:
+  port: 9000
+
+integration:
+  timezone: Asia/Shanghai
+  web-root: ../integration-web/dist
+
+processes:
+  dolphinscheduler:
+    enabled: true
+    home: C:/Users/zjbin/Desktop/apache-dolphinscheduler-3.2.2-bin
+    api-url: http://127.0.0.1:12345/dolphinscheduler
+    auto-start: true
+    health-check-path: /login
+    max-restarts: 5
+    restart-delay-ms: 5000
+  seatunnel-engine:
+    enabled: true
+    home: C:/Users/zjbin/Desktop/apache-seatunnel-2.3.11
+    auto-start: true
+    max-restarts: 5
+    restart-delay-ms: 5000
+  seatunnel-web:
+    enabled: true
+    dist-home: ../integration-seatunnel/seatunnel-web-dist/target/extracted/apache-seatunnel-web-1.0.3-SNAPSHOT
+    api-url: http://127.0.0.1:8801
+    auto-start: true
+    max-restarts: 5
+    restart-delay-ms: 10000
+
+dolphinscheduler:
+  token: "a98280b96608e6ef09c5916cc9aa1037"
+  project-code: "177657333175264"
+  username: admin
+  password: dolphinscheduler123
+  tenant-code: default
+  sync-datasource: false
+  use-ds-datasource: true
+
+seatunnel-web:
+  service-token: "st-web-ds-service-token-2026"
+  jwt-secret: seatunnel-web-jwt-secret-key-2026
+  ui-path: /seatunnel-ui
+
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.50.216:3306/integration?useSSL=false&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: seatunnel
+    password: seatunnel
+
+logging:
+  path: ./logs

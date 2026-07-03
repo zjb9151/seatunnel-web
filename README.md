@@ -1,5 +1,7 @@
 # Apache SeaTunnel
 
+> **SeaTunnel + DolphinScheduler integration:** see [INTEGRATION.md](INTEGRATION.md) for the unified platform layout (`integration-server` + `integration-web`, single entry at `:9000`).
+
 <img src="https://seatunnel.apache.org/image/logo.png" alt="seatunnel logo" height="200px" align="right" />
 
 [![Backend Workflow](https://github.com/apache/seatunnel/actions/workflows/backend.yml/badge.svg?branch=dev)](https://github.com/apache/seatunnel/actions/workflows/backend.yml)
